@@ -1,0 +1,105 @@
+﻿#include "pch-c.h"
+
+
+#include "codegen/il2cpp-codegen-metadata.h"
+
+
+
+
+
+extern void getAudio_GenerateClip_m19046130CDEDFC491F7594A0D6171073C1E30FCE (void);
+extern void getAudio_GetAudioClip_mB378FBF3F7590B0CB439FA01D430FB24D51EBA94 (void);
+extern void getAudio_Start_m2537BD5CA349D78CA30E5A749C4B26AD8E7DFA57 (void);
+extern void getAudio_Update_m3D869E75FA21C6676EFB4519BF7E1E51B19B3ACB (void);
+extern void getAudio__ctor_mC0731FBFDEE7AD7CE96312E2FC91DEF8C7ED7EF9 (void);
+extern void U3CGenerateClipU3Ed__0__ctor_m48D3952126FF1AEF1FE43006926789514F35854D (void);
+extern void U3CGenerateClipU3Ed__0_System_IDisposable_Dispose_m6D78F2389B05D7F75763EAF307904BE9468DBB0F (void);
+extern void U3CGenerateClipU3Ed__0_MoveNext_mEFA638C9E58546069931AA47348633B87B02578F (void);
+extern void U3CGenerateClipU3Ed__0_U3CU3Em__Finally1_m6A46EF999641DFE7D2E14EBC1FB9ED228C1BCFAC (void);
+extern void U3CGenerateClipU3Ed__0_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_m627306D769FB70374393B637803C2C02F9096898 (void);
+extern void U3CGenerateClipU3Ed__0_System_Collections_IEnumerator_Reset_mF03D117E809B204701760841504C8B6543B050C0 (void);
+extern void U3CGenerateClipU3Ed__0_System_Collections_IEnumerator_get_Current_m1B1043CB578ABC5CF4780138BD4492B0998F06F7 (void);
+extern void U3CGetAudioClipU3Ed__1__ctor_m17BEFF4B9F50A390DEC376AF7D5C12CDF5397870 (void);
+extern void U3CGetAudioClipU3Ed__1_System_IDisposable_Dispose_mF9F8478AA03AEC516638EB748D46087DF8A4722B (void);
+extern void U3CGetAudioClipU3Ed__1_MoveNext_m81DC41AFC94D2FAB2626258C2B75A076B334C168 (void);
+extern void U3CGetAudioClipU3Ed__1_U3CU3Em__Finally1_m794D4D6E7BBC2E072CC6E4312615FB87FE2B04AF (void);
+extern void U3CGetAudioClipU3Ed__1_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_mBB10CAA75F725778386B3A0EE2BC800A21834B69 (void);
+extern void U3CGetAudioClipU3Ed__1_System_Collections_IEnumerator_Reset_m74365A91EBFEFCA1A19B08C7BE92191F9E954BB7 (void);
+extern void U3CGetAudioClipU3Ed__1_System_Collections_IEnumerator_get_Current_m979337BA05FC39895FA1CC07B6D695EB196DF343 (void);
+extern void Readme__ctor_m69C325C4C171DCB0312B646A9034AA91EA8C39C6 (void);
+extern void Section__ctor_m5F732533E4DFC0167D965E5F5DB332E46055399B (void);
+extern void UnitySourceGeneratedAssemblyMonoScriptTypes_v1_Get_mBEB95BEB954BB63E9710BBC7AD5E78C4CB0A0033 (void);
+extern void UnitySourceGeneratedAssemblyMonoScriptTypes_v1__ctor_mE70FB23ACC1EA12ABC948AA22C2E78B2D0AA39B1 (void);
+static Il2CppMethodPointer s_methodPointers[23] = 
+{
+	getAudio_GenerateClip_m19046130CDEDFC491F7594A0D6171073C1E30FCE,
+	getAudio_GetAudioClip_mB378FBF3F7590B0CB439FA01D430FB24D51EBA94,
+	getAudio_Start_m2537BD5CA349D78CA30E5A749C4B26AD8E7DFA57,
+	getAudio_Update_m3D869E75FA21C6676EFB4519BF7E1E51B19B3ACB,
+	getAudio__ctor_mC0731FBFDEE7AD7CE96312E2FC91DEF8C7ED7EF9,
+	U3CGenerateClipU3Ed__0__ctor_m48D3952126FF1AEF1FE43006926789514F35854D,
+	U3CGenerateClipU3Ed__0_System_IDisposable_Dispose_m6D78F2389B05D7F75763EAF307904BE9468DBB0F,
+	U3CGenerateClipU3Ed__0_MoveNext_mEFA638C9E58546069931AA47348633B87B02578F,
+	U3CGenerateClipU3Ed__0_U3CU3Em__Finally1_m6A46EF999641DFE7D2E14EBC1FB9ED228C1BCFAC,
+	U3CGenerateClipU3Ed__0_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_m627306D769FB70374393B637803C2C02F9096898,
+	U3CGenerateClipU3Ed__0_System_Collections_IEnumerator_Reset_mF03D117E809B204701760841504C8B6543B050C0,
+	U3CGenerateClipU3Ed__0_System_Collections_IEnumerator_get_Current_m1B1043CB578ABC5CF4780138BD4492B0998F06F7,
+	U3CGetAudioClipU3Ed__1__ctor_m17BEFF4B9F50A390DEC376AF7D5C12CDF5397870,
+	U3CGetAudioClipU3Ed__1_System_IDisposable_Dispose_mF9F8478AA03AEC516638EB748D46087DF8A4722B,
+	U3CGetAudioClipU3Ed__1_MoveNext_m81DC41AFC94D2FAB2626258C2B75A076B334C168,
+	U3CGetAudioClipU3Ed__1_U3CU3Em__Finally1_m794D4D6E7BBC2E072CC6E4312615FB87FE2B04AF,
+	U3CGetAudioClipU3Ed__1_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_mBB10CAA75F725778386B3A0EE2BC800A21834B69,
+	U3CGetAudioClipU3Ed__1_System_Collections_IEnumerator_Reset_m74365A91EBFEFCA1A19B08C7BE92191F9E954BB7,
+	U3CGetAudioClipU3Ed__1_System_Collections_IEnumerator_get_Current_m979337BA05FC39895FA1CC07B6D695EB196DF343,
+	Readme__ctor_m69C325C4C171DCB0312B646A9034AA91EA8C39C6,
+	Section__ctor_m5F732533E4DFC0167D965E5F5DB332E46055399B,
+	UnitySourceGeneratedAssemblyMonoScriptTypes_v1_Get_mBEB95BEB954BB63E9710BBC7AD5E78C4CB0A0033,
+	UnitySourceGeneratedAssemblyMonoScriptTypes_v1__ctor_mE70FB23ACC1EA12ABC948AA22C2E78B2D0AA39B1,
+};
+static const int32_t s_InvokerIndices[23] = 
+{
+	18975,
+	18975,
+	19197,
+	19197,
+	19197,
+	14629,
+	19197,
+	18740,
+	19197,
+	18975,
+	19197,
+	18975,
+	14629,
+	19197,
+	18740,
+	19197,
+	18975,
+	19197,
+	18975,
+	19197,
+	19197,
+	31177,
+	19197,
+};
+IL2CPP_EXTERN_C const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule;
+const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule = 
+{
+	"Assembly-CSharp.dll",
+	23,
+	s_methodPointers,
+	0,
+	NULL,
+	s_InvokerIndices,
+	0,
+	NULL,
+	0,
+	NULL,
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+};
