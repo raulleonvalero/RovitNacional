@@ -2,6 +2,8 @@ using Piper;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using moveAvatar;
+using System.Collections;
 
 public class movement : MonoBehaviour
 {
@@ -18,6 +20,10 @@ public class movement : MonoBehaviour
     public PiperManager piper;
     public AudioSource audioSpeaker;
 
+    public GameObject rightObject;
+    public Transform goal;
+
+    IEnumerator move;
     
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -29,6 +35,8 @@ public class movement : MonoBehaviour
         jumpAction = InputSystem.actions.FindAction("Jump");
 
         isSpeaking = false;
+
+        move = MoveObject.MoveAvatarHand(rightObject, goal.position, 0.05f);
     }
     private async void Speak(string text)
     {
@@ -83,7 +91,8 @@ public class movement : MonoBehaviour
 
         //characterBody.MovePosition(characterBody.position * (position * Time.fixedDeltaTime));
 
-        if (jumpValues && !isSpeaking)
-            Speak("This is a Test");
+        if (jumpValues)
+            StartCoroutine(move);
+
     }
 }

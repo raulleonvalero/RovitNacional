@@ -1,7 +1,25 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
+namespace moveAvatar
+{
+    public class MoveObject : MonoBehaviour
+    {
+        public static IEnumerator MoveAvatarHand(GameObject gameObject, Vector3 endPoint, float speed = 0.1f)
+        {
+            while (!(gameObject.transform.position == endPoint))
+            {
+                gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, endPoint, speed * Time.deltaTime);
+                yield return null;
+            }
+            yield return null;
+        }
+    }
+}
+/*
 public class MoveObject : MonoBehaviour
 {
     public GameObject rightObject;
@@ -85,6 +103,16 @@ public class MoveObject : MonoBehaviour
         
     }
 
+    public IEnumerator moveHand(GameObject gameObject, Vector3 endPoint)
+    {
+        while(!(gameObject.transform.position == endPoint))
+        {
+            gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, endPoint, speed * Time.deltaTime);
+            return null;
+        }
+        return null;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -102,6 +130,6 @@ public class MoveObject : MonoBehaviour
             if (Vector3.Distance(rightObject.transform.position, allPositions[counter]) < DistanceToTarget) counter++;
 
         }
-        */
     }
 }
+        */
