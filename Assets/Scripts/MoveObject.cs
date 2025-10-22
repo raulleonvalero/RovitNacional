@@ -66,7 +66,7 @@ public class MoveObject : MonoBehaviour
         rightStartPosition = rightObject.transform.position;
         leftStartPosition = leftObject.transform.position;
 
-        //goal = goalPosition;
+        goal = goalPosition.position;
         allPositions = GetQuadraticBezierPoints(rightStartPosition, goalPosition.position, 0.1f);
 
         print("Points:: " + allPositions.ToString());
@@ -75,8 +75,8 @@ public class MoveObject : MonoBehaviour
     private bool move(GameObject gameObject, Vector3 endPoint)
     {
         Vector3 test = Vector3.Lerp(gameObject.transform.position, endPoint, speed);
-        //gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, endPoint, speed * Time.deltaTime);
-        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, test, speed * Time.deltaTime);
+        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, endPoint, speed * Time.deltaTime);
+        //gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, test, speed * Time.deltaTime);
         if (gameObject.transform.position == endPoint)
             return true;
         else
@@ -88,20 +88,20 @@ public class MoveObject : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*
         if (move(rightObject, goal))
             goal = rightStartPosition;
         if (rightObject.transform.position == rightStartPosition)
-            goal = goalPosition;
-        */
+            goal = goalPosition.position;
         print("Counter: " + counter);
         print("allPoint: " + allPositions.Length);
 
+        /*
         if (counter < allPositions.Length)
         {
             rightObject.transform.position = Vector3.MoveTowards(rightObject.transform.position, allPositions[counter], Time.deltaTime);
             if (Vector3.Distance(rightObject.transform.position, allPositions[counter]) < DistanceToTarget) counter++;
 
         }
+        */
     }
 }
