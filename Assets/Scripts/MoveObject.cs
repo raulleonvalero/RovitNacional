@@ -6,9 +6,15 @@ using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCou
 
 namespace moveAvatar
 {
-    public class MoveObject : MonoBehaviour
+    public class Avatar : MonoBehaviour
     {
-        public static IEnumerator MoveAvatarHand(GameObject gameObject, Vector3 endPoint, float speed = 0.1f)
+        Avatar(GameObject Character)
+        {
+
+        }
+        private IEnumerator MoveRightHand;
+        private IEnumerator MoveLeftHand;
+        public IEnumerator MoveAvatarHand(GameObject gameObject, Vector3 endPoint, float speed = 0.1f)
         {
             while (!(gameObject.transform.position == endPoint))
             {
