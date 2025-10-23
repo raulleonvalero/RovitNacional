@@ -1,7 +1,64 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
+using static Unity.Burst.Intrinsics.X86;
 using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
+
+public class Character : MonoBehaviour
+{
+    GameObject rightObject;
+    GameObject leftObject;
+
+    private IEnumerator moveRightHand;
+    private IEnumerator moveLeftHand;
+
+    public void Start()
+    {
+        int child = transform.childCount;
+        for (int i = 0; i < child; i++)
+        {
+            var aux = transform.GetChild(i);
+            if (aux.name == "Right")
+            {
+                rightObject = aux.gameObject;
+            }
+            if (aux.name == "Left")
+            {
+                leftObject = aux.gameObject;
+            }
+        }
+    }
+    public void Update()
+    {
+
+    }
+
+    public IEnumerator MoveAvatarHand(GameObject gameObject, Vector3 endPoint, float speed = 0.1f)
+    {
+        while (!(gameObject.transform.position == endPoint))
+        {
+            gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, endPoint, speed * Time.deltaTime);
+            yield return null;
+        }
+        yield return null;
+    }
+
+    public void MoveRightHand(Vector3 target, float speed = 0.08f)
+    {
+        moveRightHand = MoveAvatarHand(rightObject, target, speed);
+        StartCoroutine(moveRightHand);
+    }
+
+    public void MoveLeftHand(Vector3 target, float speed = 0.08f)
+    {
+        moveLeftHand = MoveAvatarHand(leftObject, target, speed);
+        StartCoroutine(moveLeftHand);
+    }
+}
+
+/*
 public class MoveObject : MonoBehaviour
 {
     public GameObject rightObject;
@@ -66,7 +123,7 @@ public class MoveObject : MonoBehaviour
         rightStartPosition = rightObject.transform.position;
         leftStartPosition = leftObject.transform.position;
 
-        //goal = goalPosition;
+        goal = goalPosition.position;
         allPositions = GetQuadraticBezierPoints(rightStartPosition, goalPosition.position, 0.1f);
 
         print("Points:: " + allPositions.ToString());
@@ -75,8 +132,8 @@ public class MoveObject : MonoBehaviour
     private bool move(GameObject gameObject, Vector3 endPoint)
     {
         Vector3 test = Vector3.Lerp(gameObject.transform.position, endPoint, speed);
-        //gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, endPoint, speed * Time.deltaTime);
-        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, test, speed * Time.deltaTime);
+        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, endPoint, speed * Time.deltaTime);
+        //gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, test, speed * Time.deltaTime);
         if (gameObject.transform.position == endPoint)
             return true;
         else
@@ -85,18 +142,27 @@ public class MoveObject : MonoBehaviour
         
     }
 
+    public IEnumerator moveHand(GameObject gameObject, Vector3 endPoint)
+    {
+        while(!(gameObject.transform.position == endPoint))
+        {
+            gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, endPoint, speed * Time.deltaTime);
+            return null;
+        }
+        return null;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        /*
         if (move(rightObject, goal))
             goal = rightStartPosition;
         if (rightObject.transform.position == rightStartPosition)
-            goal = goalPosition;
-        */
+            goal = goalPosition.position;
         print("Counter: " + counter);
         print("allPoint: " + allPositions.Length);
 
+        /*
         if (counter < allPositions.Length)
         {
             rightObject.transform.position = Vector3.MoveTowards(rightObject.transform.position, allPositions[counter], Time.deltaTime);
@@ -105,3 +171,4 @@ public class MoveObject : MonoBehaviour
         }
     }
 }
+        */
