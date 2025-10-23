@@ -2,29 +2,62 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+using static Unity.Burst.Intrinsics.X86;
 using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
-namespace moveAvatar
-{
-    public class Avatar : MonoBehaviour
-    {
-        Avatar(GameObject Character)
-        {
 
-        }
-        private IEnumerator MoveRightHand;
-        private IEnumerator MoveLeftHand;
-        public IEnumerator MoveAvatarHand(GameObject gameObject, Vector3 endPoint, float speed = 0.1f)
+public class Character : MonoBehaviour
+{
+    GameObject rightObject;
+    GameObject leftObject;
+
+    private IEnumerator moveRightHand;
+    private IEnumerator moveLeftHand;
+
+    public void Start()
+    {
+        int child = transform.childCount;
+        for (int i = 0; i < child; i++)
         {
-            while (!(gameObject.transform.position == endPoint))
+            var aux = transform.GetChild(i);
+            if (aux.name == "Right")
             {
-                gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, endPoint, speed * Time.deltaTime);
-                yield return null;
+                rightObject = aux.gameObject;
             }
-            yield return null;
+            if (aux.name == "Left")
+            {
+                leftObject = aux.gameObject;
+            }
         }
     }
+    public void Update()
+    {
+
+    }
+
+    public IEnumerator MoveAvatarHand(GameObject gameObject, Vector3 endPoint, float speed = 0.1f)
+    {
+        while (!(gameObject.transform.position == endPoint))
+        {
+            gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, endPoint, speed * Time.deltaTime);
+            yield return null;
+        }
+        yield return null;
+    }
+
+    public void MoveRightHand(Vector3 target, float speed = 0.08f)
+    {
+        moveRightHand = MoveAvatarHand(rightObject, target, speed);
+        StartCoroutine(moveRightHand);
+    }
+
+    public void MoveLeftHand(Vector3 target, float speed = 0.08f)
+    {
+        moveLeftHand = MoveAvatarHand(leftObject, target, speed);
+        StartCoroutine(moveLeftHand);
+    }
 }
+
 /*
 public class MoveObject : MonoBehaviour
 {

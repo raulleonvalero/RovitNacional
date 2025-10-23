@@ -2,7 +2,6 @@ using Piper;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using moveAvatar;
 using System.Collections;
 
 public class movement : MonoBehaviour
@@ -23,7 +22,7 @@ public class movement : MonoBehaviour
     public GameObject rightObject;
     public Transform goal;
 
-    IEnumerator move;
+    private Character character;
     
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -36,7 +35,8 @@ public class movement : MonoBehaviour
 
         isSpeaking = false;
 
-        move = MoveObject.MoveAvatarHand(rightObject, goal.position, 0.05f);
+        character = GameObject.Find("Character1").GetComponent<Character>();
+
     }
     private async void Speak(string text)
     {
@@ -92,7 +92,7 @@ public class movement : MonoBehaviour
         //characterBody.MovePosition(characterBody.position * (position * Time.fixedDeltaTime));
 
         if (jumpValues)
-            StartCoroutine(move);
+            character.MoveRightHand(Vector3.zero);
 
     }
 }
