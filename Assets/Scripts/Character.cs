@@ -1,3 +1,4 @@
+using Piper;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -8,11 +9,21 @@ using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCou
 
 public class Character : MonoBehaviour
 {
-    GameObject rightObject;
-    GameObject leftObject;
+    private GameObject rightObject;
+    private GameObject leftObject;
 
     private IEnumerator moveRightHand;
     private IEnumerator moveLeftHand;
+
+    private Vector3 originPos;
+
+    private AudioSource source;
+    private PiperManager piper;
+
+    public void Awake()
+    {
+        source = GetComponent<AudioSource>();
+    }
 
     public void Start()
     {
@@ -29,10 +40,33 @@ public class Character : MonoBehaviour
                 leftObject = aux.gameObject;
             }
         }
+
+        piper = GetComponentInChildren<PiperManager>();
+        source = GetComponentInChildren<AudioSource>();
     }
     public void Update()
     {
 
+    }
+
+    public async void Speak(string text)
+    {
+        var sw = new System.Diagnostics.Stopwatch();
+        sw.Start();
+
+        var audio = piper.TextToSpeechAsync(text);
+
+        source.Stop();
+        if (source && source.clip)
+            Destroy(source.clip);
+
+        source.clip = await audio;
+        source.Play();
+    }
+
+    public bool isSpeaking()
+    {
+        return source.isPlaying;
     }
 
     public IEnumerator MoveAvatarHand(GameObject gameObject, Vector3 endPoint, float speed = 0.1f)

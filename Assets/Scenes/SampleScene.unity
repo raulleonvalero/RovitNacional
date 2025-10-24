@@ -622,14 +622,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b0030b47ca80ed44b32bdc601eb4b49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Piper.PiperManager
-  modelAsset: {fileID: 5022602860645237092, guid: c5c4b03e0dbca4548be0bb890ca86677, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 58af0886ad2d54a47bdb32067b193784, type: 3}
   sampleRate: 22050
   scaleSpeed: 1
   scalePitch: 1
   scaleGlottal: 0.8
   espeakNgRelativePath: espeak-ng-data
-  voice: en-us
-  backendType: 512
+  voice: es
+  backendType: 257
 --- !u!4 &298022995
 Transform:
   m_ObjectHideFlags: 0
@@ -939,7 +939,7 @@ Transform:
   m_GameObject: {fileID: 410096497}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.58, y: 1.751, z: -2.99}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
