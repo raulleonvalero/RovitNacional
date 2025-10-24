@@ -38,21 +38,7 @@ public class movement : MonoBehaviour
         character = GameObject.Find("Character1").GetComponent<Character>();
 
     }
-    private async void Speak(string text)
-    {
-        isSpeaking = true;
-
-        Debug.Log("Piper Text: " + text);
-
-        AudioClip clip = await piper.TextToSpeechAsync(text);
-
-        audioSpeaker.clip = clip;
-        audioSpeaker.Play();
-
-        Debug.Log(audioSpeaker.isPlaying);
-
-        isSpeaking = false;
-    }
+    
 
     // Update is called once per frame
     void FixedUpdate()
@@ -92,7 +78,7 @@ public class movement : MonoBehaviour
         //characterBody.MovePosition(characterBody.position * (position * Time.fixedDeltaTime));
 
         if (jumpValues)
-            character.MoveRightHand(Vector3.zero);
+            character.Speak("Esto es Una Prueba");
 
     }
 }
