@@ -80,7 +80,7 @@ public class movement : MonoBehaviour
 
         if (jumpValues)
         {
-            character.Speak(i);
+            character.Speak(10);
             
         }
             

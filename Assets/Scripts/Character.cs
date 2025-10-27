@@ -73,7 +73,7 @@ public class Character : MonoBehaviour
         if (source && source.clip)
             Destroy(source.clip);
         */
-        AudioClip clip = Resources.Load<AudioClip>("Sounds/" + Frases[i]);
+        AudioClip clip = Resources.Load<AudioClip>("Sounds/spanish" + i);
         Debug.Log("CLIP: " + clip.name);
         //source.clip = clip;
 
