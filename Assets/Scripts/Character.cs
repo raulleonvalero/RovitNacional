@@ -20,6 +20,8 @@ public class Character : MonoBehaviour
     private AudioSource source;
     private PiperManager piper;
 
+    private static readonly string[] Frases = { "spanish0", "spanish1", "spanish2", "spanish3", "spanish4", 
+                                                "spanish5", "spanish6", "spanish7", "spanish8", "spanish9"};
     public void Awake()
     {
         source = GetComponent<AudioSource>();
@@ -49,7 +51,7 @@ public class Character : MonoBehaviour
 
     }
 
-    public async void Speak(string text)
+    /*public async void Speak(string text)
     {
         var sw = new System.Diagnostics.Stopwatch();
         sw.Start();
@@ -62,6 +64,20 @@ public class Character : MonoBehaviour
 
         source.clip = await audio;
         source.Play();
+    }*/
+    public void Speak(int i)
+    {
+        source.Stop();
+
+        /*var clip = "Sounds/" + Frases[i] + ".wav";
+        if (source && source.clip)
+            Destroy(source.clip);
+        */
+        AudioClip clip = Resources.Load<AudioClip>("Sounds/" + Frases[i]);
+        Debug.Log("CLIP: " + clip.name);
+        //source.clip = clip;
+
+        source.PlayOneShot(clip);
     }
 
     public bool isSpeaking()

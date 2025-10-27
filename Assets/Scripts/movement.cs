@@ -23,7 +23,8 @@ public class movement : MonoBehaviour
     public Transform goal;
 
     private Character character;
-    
+
+    private int i = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -78,7 +79,11 @@ public class movement : MonoBehaviour
         //characterBody.MovePosition(characterBody.position * (position * Time.fixedDeltaTime));
 
         if (jumpValues)
-            character.Speak("Esto es Una Prueba");
+        {
+            character.Speak(i);
+            
+        }
+            
 
     }
 }
