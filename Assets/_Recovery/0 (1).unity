@@ -2657,7 +2657,7 @@ MonoBehaviour:
   avatar: {fileID: 85298123}
   left_rest: {fileID: 497948906}
   right_rest: {fileID: 527854807}
-  timeLimit: 6
+  timeLimit: 4
 --- !u!4 &1335086041
 Transform:
   m_ObjectHideFlags: 0

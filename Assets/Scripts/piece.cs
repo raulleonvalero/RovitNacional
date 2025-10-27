@@ -21,6 +21,11 @@ public class SimpleRespawn : MonoBehaviour
 
     bool isBeingTouched = false;
 
+    public Transform getSpawnPoint()
+    {
+        return spawnPoint;
+    }
+
     public bool IsBeingTouched()
     {
         return isBeingTouched;
