@@ -10,6 +10,8 @@ public class Controller : MonoBehaviour
 
     [Header("Avatar")]
     [SerializeField] private GameObject avatar;
+    [SerializeField] private GameObject left_rest;
+    [SerializeField] private GameObject right_rest;
 
     [Header("Experimento")]
     [SerializeField] private float timeLimit = 15f;
@@ -22,6 +24,9 @@ public class Controller : MonoBehaviour
 
     void Start()
     {
+        avatar.GetComponent<Character>().MoveLeftHand(left_rest.transform.position, 0.3f);
+        avatar.GetComponent<Character>().MoveRightHand(right_rest.transform.position, 0.3f);
+
         StartCoroutine(ExperimentRoutine());
     }
 
@@ -81,10 +86,14 @@ public class Controller : MonoBehaviour
             piece_id = Random.Range(0, Mathf.Max(1, pieces.Count));
 
             // Paso 3: Explicar la tarea
-            // avatar?.GetComponent<Speack>()?.Speack();
+            //avatar?.GetComponent<Speack>()?.Speack();
 
             // Paso 4: Detectar si la tarea se completa con límite de tiempo
-            // if (!user) avatar?.GetComponent<AvatarController>()?.EnableControl();
+            
+            if (!user){
+                Vector3 target = pieces[piece_id].transform.position;
+                avatar.GetComponent<Character>().MoveRightHand(target, 0.3f);
+            }
 
             complete = false;
             result = 0;
@@ -131,6 +140,11 @@ public class Controller : MonoBehaviour
 
             // Paso 5: Registrar resultados
             // avatar?.GetComponent<Speack>()?.Speack();
+
+            if (!user)
+            {
+                avatar.GetComponent<Character>().MoveRightHand(right_rest.transform.position, 0.3f);
+            }
 
             yield return new WaitForSeconds(3f);
 
