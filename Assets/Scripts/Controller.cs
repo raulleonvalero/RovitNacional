@@ -13,6 +13,9 @@ public class Controller : MonoBehaviour
     [SerializeField] private GameObject left_rest;
     [SerializeField] private GameObject right_rest;
 
+    [SerializeField] private GameObject head_look;
+    [SerializeField] private Transform look_target;
+
     [Header("Experimento")]
     [SerializeField] private float timeLimit = 15f;
 
@@ -22,14 +25,14 @@ public class Controller : MonoBehaviour
     private int piece_id = 0;
     private int result = 0;
 
-    private string text = "";
-
     void Start()
     {
         avatar.GetComponent<Character>().MoveLeftHand(left_rest.transform.position, 0.3f);
         avatar.GetComponent<Character>().MoveRightHand(right_rest.transform.position, 0.3f);
 
         StartCoroutine(ExperimentRoutine());
+
+        lookAt(look_target);
     }
 
     void SetRandomSpawns()
@@ -71,18 +74,26 @@ public class Controller : MonoBehaviour
         }
     }
 
+    private void lookAt(Transform target)
+    {
+        head_look.GetComponent<IKControl>().lookObj = target;
+    }
+
     IEnumerator ExperimentRoutine()
     {
         Debug.Log("Experimento iniciado.");
 
+        yield return new WaitForSeconds(5f);
+
         // Paso 1: Explicación del experimento
-        text = "Hello, this is a test run. First, I will say who has to touch the piece, you or me. Then, I will say which piece to touch.";
-        //avatar.GetComponent<Character>().Speak(text);
+        avatar.GetComponent<Character>().Speak(1);
 
         while (avatar.GetComponent<Character>().isSpeaking())
         {
             yield return null; // Espera hasta que termine de hablar
         }
+
+        yield return new WaitForSeconds(2f);
 
         while (true) // bucle de trials; si quieres número fijo, reemplaza por for (int t=0; t<T; t++)
         {
@@ -92,38 +103,48 @@ public class Controller : MonoBehaviour
             user = Random.Range(0, 2) == 1;                  // true = user, false = avatar
             piece_id = Random.Range(0, Mathf.Max(1, pieces.Count));
 
-            /*
-            string piece_name = "";
-
-            if (pieces[piece_id] != null)
-            {
-                piece_name = pieces[piece_id].name;
-            }
-            else
-            {
-                piece_name = "unknown piece";
-            }
 
             if (user)
             {
-                text = "You have to touch the " + piece_name;
-                avatar.GetComponent<Character>().Speak(text);
+                if (piece_id == 0)
+                {
+                    avatar.GetComponent<Character>().Speak(4); 
+                }
+                else if (piece_id == 1)
+                {
+                    avatar.GetComponent<Character>().Speak(5); 
+                }
+                else if (piece_id == 2)
+                {
+                    avatar.GetComponent<Character>().Speak(6);
+                }
             }
             else
             {
-                text = "I will touch the " + piece_name;
-                avatar.GetComponent<Character>().Speak(text);
+                if (piece_id == 0)
+                {
+                    avatar.GetComponent<Character>().Speak(7); 
+                }
+                else if (piece_id == 1)
+                {
+                    avatar.GetComponent<Character>().Speak(8); 
+                }
+                else if (piece_id == 2)
+                {
+                    avatar.GetComponent<Character>().Speak(9); 
+                }
             }
-            
+
             while (avatar.GetComponent<Character>().isSpeaking())
             {
                 yield return null; // Espera hasta que termine de hablar
             }
-            */
 
             // Paso 4: Detectar si la tarea se completa con límite de tiempo
 
             if (!user){
+
+                lookAt(pieces[piece_id].transform);
 
                 if (pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() == spawnPoints[2]) // Si la pieza está en el spawn derecho
                 {
@@ -180,28 +201,33 @@ public class Controller : MonoBehaviour
 
             if (!user)
             {
+                lookAt(look_target);
                 avatar.GetComponent<Character>().MoveRightHand(right_rest.transform.position, 0.3f);
                 avatar.GetComponent<Character>().MoveLeftHand(left_rest.transform.position, 0.3f);
             }
+
+            yield return new WaitForSeconds(1f);
 
             // Paso 5: Registrar resultados
             if (result == 1 && user)
             {
                 Debug.Log("Resultado: Tiempo límite alcanzado.");
-                text = "Time is up!";
-                //avatar.GetComponent<Character>().Speak(text);
+                avatar.GetComponent<Character>().Speak(1);
             }
             else if (result == 2 || (result == 1 && !user))
             {
                 Debug.Log("Resultado: Tarea completada correctamente.");
-                text = "Well done!";
-                //avatar.GetComponent<Character>().Speak(text);
+                avatar.GetComponent<Character>().Speak(2);
             }
-            else if (result == 3)
+            else if (user && result == 3)
             {
                 Debug.Log("Resultado: Pieza incorrecta seleccionada.");
-                text = "Wrong piece!";
-                //avatar.GetComponent<Character>().Speak(text);
+                avatar.GetComponent<Character>().Speak(3);
+            }
+            else if (!user && (result == 2 || result == 3))
+            {
+                Debug.Log("Resultado: Turno incorrecto.");
+                avatar.GetComponent<Character>().Speak(9);
             }
 
             while (avatar.GetComponent<Character>().isSpeaking())

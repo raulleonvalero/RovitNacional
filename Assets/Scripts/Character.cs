@@ -106,6 +106,11 @@ public class Character : MonoBehaviour
         moveLeftHand = MoveAvatarHand(leftObject, target, speed);
         StartCoroutine(moveLeftHand);
     }
+
+    public void lookAt(Transform target)
+    {
+        
+    }
 }
 
 /*
