@@ -18,6 +18,11 @@ public class Character : MonoBehaviour
     private AudioSource source;
     private PiperManager piper;
 
+    private Animator anim;
+
+    private int m_TalkStateHash;
+    private bool initAnim = false;
+
     private static readonly string[] Frases = { "spanish0", "spanish1", "spanish2", "spanish3", "spanish4", 
                                                 "spanish5", "spanish6", "spanish7", "spanish8", "spanish9", "spanish10"};
     public void Awake()
@@ -39,14 +44,31 @@ public class Character : MonoBehaviour
             {
                 leftObject = aux.gameObject;
             }
+            if (aux.name == "test")
+            {
+                anim = aux.GetComponent<Animator>();
+                m_TalkStateHash = Animator.StringToHash("Base Layer.test_Imported_4487785415424_TempMotion");
+                anim.Play(m_TalkStateHash, 0, 1f);
+            }
         }
 
         piper = GetComponentInChildren<PiperManager>();
         source = GetComponentInChildren<AudioSource>();
     }
+    
     public void Update()
     {
-
+        if(source.isPlaying && !initAnim)
+        {
+            initAnim = true;
+            anim.Play(m_TalkStateHash, 0, 0.25f);
+        }
+        if (!source.isPlaying)
+        {
+            initAnim = false;
+            anim.Play(m_TalkStateHash, 0, 1f);
+        }
+        //Debug.Log("Anim: " + anim.)
     }
 
     /*public async void Speak(string text)
