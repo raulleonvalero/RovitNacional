@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
 using static Unity.Burst.Intrinsics.X86;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
-
 
 public class Character : MonoBehaviour
 {
@@ -21,7 +19,7 @@ public class Character : MonoBehaviour
     private PiperManager piper;
 
     private static readonly string[] Frases = { "spanish0", "spanish1", "spanish2", "spanish3", "spanish4", 
-                                                "spanish5", "spanish6", "spanish7", "spanish8", "spanish9"};
+                                                "spanish5", "spanish6", "spanish7", "spanish8", "spanish9", "spanish10"};
     public void Awake()
     {
         source = GetComponent<AudioSource>();
@@ -85,6 +83,52 @@ public class Character : MonoBehaviour
         return source.isPlaying;
     }
 
+    public IEnumerator MoveAvatarHandTopDown(
+    GameObject go,
+    Vector3 endPoint,
+    float speed = 0.1f,
+    float overHeight = 0.15f,   // altura extra por encima del objetivo para iniciar la bajada
+    float hoverFraction = 0.6f,  // 0..1: porcentaje del recorrido XZ desde start hacia el objetivo
+    float stopDistance = 0.001f) // tolerancia de llegada
+    {
+        Transform tr = go.transform;
+        float eps2 = stopDistance * stopDistance;
+
+        Vector3 start = tr.position;
+
+        // Punto de hover proyectado SOBRE EL SEGMENTO start->end en XZ (entre ambos)
+        Vector2 startXZ = new Vector2(start.x, start.z);
+        Vector2 endXZ = new Vector2(endPoint.x, endPoint.z);
+        Vector2 deltaXZ = endXZ - startXZ;
+        float distXZ = deltaXZ.magnitude;
+
+        float frac = Mathf.Clamp01(hoverFraction);
+        if (distXZ > 0f)
+            frac = Mathf.Clamp(frac, 0.01f, 0.99f); // asegurar que queda "entre", no en los extremos
+
+        Vector2 hoverXZ = startXZ + deltaXZ * frac;
+        float hoverY = Mathf.Max(start.y, endPoint.y + overHeight);
+        Vector3 hoverPoint = new Vector3(hoverXZ.x, hoverY, hoverXZ.y);
+
+        // Fase 1: ir al punto intermedio elevado (entre start y end en XZ)
+        while ((tr.position - hoverPoint).sqrMagnitude > eps2)
+        {
+            tr.position = Vector3.MoveTowards(tr.position, hoverPoint, speed * Time.deltaTime);
+            yield return null;
+        }
+
+        // Fase 2: bajada en DIAGONAL desde el hoverPoint directamente hasta el endPoint
+        while ((tr.position - endPoint).sqrMagnitude > eps2)
+        {
+            tr.position = Vector3.MoveTowards(tr.position, endPoint, speed * Time.deltaTime);
+            yield return null;
+        }
+
+        tr.position = endPoint;
+    }
+
+
+
     public IEnumerator MoveAvatarHand(GameObject gameObject, Vector3 endPoint, float speed = 0.1f)
     {
         while (!(gameObject.transform.position == endPoint))
@@ -97,19 +141,14 @@ public class Character : MonoBehaviour
 
     public void MoveRightHand(Vector3 target, float speed = 0.08f)
     {
-        moveRightHand = MoveAvatarHand(rightObject, target, speed);
+        moveRightHand = MoveAvatarHandTopDown(rightObject, target, speed);
         StartCoroutine(moveRightHand);
     }
 
     public void MoveLeftHand(Vector3 target, float speed = 0.08f)
     {
-        moveLeftHand = MoveAvatarHand(leftObject, target, speed);
+        moveLeftHand = MoveAvatarHandTopDown(leftObject, target, speed);
         StartCoroutine(moveLeftHand);
-    }
-
-    public void lookAt(Transform target)
-    {
-        
     }
 }
 
