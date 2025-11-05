@@ -8,7 +8,6 @@ public class SimpleRespawn : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] private Transform spawnPoint;   // Objeto que hace de spawn
-    [SerializeField] private Collider boundsVolume;  // Objeto que define el límite (su .bounds)
 
     [Header("Opciones")]
     [SerializeField] private bool copyRotation = true;
@@ -20,6 +19,11 @@ public class SimpleRespawn : MonoBehaviour
     Rigidbody rb;
 
     bool isBeingTouched = false;
+
+    public Transform getSpawnPoint()
+    {
+        return spawnPoint;
+    }
 
     public bool IsBeingTouched()
     {
@@ -34,8 +38,6 @@ public class SimpleRespawn : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        if (boundsVolume == null)
-            Debug.LogWarning($"[{name}] No hay boundsVolume asignado.");
         if (spawnPoint == null)
             Debug.LogWarning($"[{name}] No hay spawnPoint asignado.");
     }
@@ -47,11 +49,8 @@ public class SimpleRespawn : MonoBehaviour
 
     void Update()
     {
-        if (boundsVolume == null) return;
-
-        // Si el centro del objeto sale de los límites, respawn
-        if (!boundsVolume.bounds.Contains(transform.position))
-            Respawn();
+        // if object below certain Y level, respawn
+        if (transform.position.y < 1.0f) Respawn();
     }
 
     public void Respawn()
@@ -96,12 +95,12 @@ public class SimpleRespawn : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        
+
     }
 
     void OnCollisionExit(Collision collision)
     {
-       
+
     }
 
     void OnTriggerEnter(Collider other)
