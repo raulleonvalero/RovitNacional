@@ -2,6 +2,7 @@ using Piper;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using RovitNacional;
 using System.Collections;
 
 public class movement : MonoBehaviour
@@ -80,7 +81,8 @@ public class movement : MonoBehaviour
 
         if (jumpValues)
         {
-            character.Speak(1);
+            character.setMode(Activity.GoStopGo, Mode.Down);
+            character.Speak("action_touch_cube_red_2");
             
         }
             

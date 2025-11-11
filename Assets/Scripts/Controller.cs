@@ -19,20 +19,36 @@ public class Controller : MonoBehaviour
     [Header("Experimento")]
     [SerializeField] private float timeLimit = 15f;
 
-    // Parámetros del experimento (puedes dejarlos si quieres ver estado global)
+    // Parámetros del experimento 
+    private bool experimentRunning = false;
     private bool user = false;
     private bool complete = false;
     private int piece_id = 0;
     private int result = 0;
+
+    // Parametros auxiliares
+    private Vector3 piece_height_offset = new Vector3(0, 0.1f, 0);
 
     void Start()
     {
         avatar.GetComponent<Character>().MoveLeftHand(left_rest.transform.position, 0.3f);
         avatar.GetComponent<Character>().MoveRightHand(right_rest.transform.position, 0.3f);
 
-        StartCoroutine(ExperimentRoutine());
-
         lookAt(look_target);
+    }
+
+    public void OnStartExperimentButtonPressed()
+    {
+        if (experimentRunning)
+        {
+            StopAllCoroutines();
+            experimentRunning = false;
+        }
+        else
+        {
+            StartCoroutine(ExperimentRoutine());
+            experimentRunning = true;
+        }
     }
 
     void SetRandomSpawns()
@@ -76,17 +92,15 @@ public class Controller : MonoBehaviour
 
     private void lookAt(Transform target)
     {
-        head_look.GetComponent<IKControl>().lookObj = target;
+        //head_look.GetComponent<IKControl>().lookObj = target;
     }
 
     IEnumerator ExperimentRoutine()
     {
         Debug.Log("Experimento iniciado.");
 
-        yield return new WaitForSeconds(5f);
-
         // Paso 1: Explicación del experimento
-        avatar.GetComponent<Character>().Speak(1);
+        avatar.GetComponent<Character>().Speak(0);
 
         while (avatar.GetComponent<Character>().isSpeaking())
         {
@@ -135,24 +149,23 @@ public class Controller : MonoBehaviour
                 }
             }
 
-            while (avatar.GetComponent<Character>().isSpeaking())
-            {
-                yield return null; // Espera hasta que termine de hablar
-            }
+            while (avatar.GetComponent<Character>().isSpeaking()) yield return null; // Espera hasta que termine de hablar
 
             // Paso 4: Detectar si la tarea se completa con límite de tiempo
 
             if (!user){
 
+                yield return new WaitForSeconds(3f);
+
                 lookAt(pieces[piece_id].transform);
 
                 if (pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() == spawnPoints[2]) // Si la pieza está en el spawn derecho
                 {
-                    avatar.GetComponent<Character>().MoveLeftHand(pieces[piece_id].transform.position, 0.3f);
+                    avatar.GetComponent<Character>().MoveLeftHand(pieces[piece_id].transform.position + piece_height_offset, 0.4f);
                 }
                 else
                 {
-                    avatar.GetComponent<Character>().MoveRightHand(pieces[piece_id].transform.position, 0.3f);
+                    avatar.GetComponent<Character>().MoveRightHand(pieces[piece_id].transform.position + piece_height_offset, 0.4f);
                 }
             }
 
@@ -199,14 +212,27 @@ public class Controller : MonoBehaviour
                 yield return null; // ¡No bloquear! Espera al siguiente frame
             }
 
+
+            lookAt(look_target);
+
             if (!user)
             {
-                lookAt(look_target);
-                avatar.GetComponent<Character>().MoveRightHand(right_rest.transform.position, 0.3f);
-                avatar.GetComponent<Character>().MoveLeftHand(left_rest.transform.position, 0.3f);
+                if (pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() == spawnPoints[2]) // Si la pieza está en el spawn derecho
+                {
+                    avatar.GetComponent<Character>().MoveLeftHand(left_rest.transform.position, 0.6f);
+                }
+                else
+                {
+                    avatar.GetComponent<Character>().MoveRightHand(right_rest.transform.position, 0.6f);
+                }
+
             }
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1.5f);
+
+            avatar.GetComponent<Character>().SetLeftHand(left_rest.transform);
+            avatar.GetComponent<Character>().SetRightHand(right_rest.transform);
+
 
             // Paso 5: Registrar resultados
             if (result == 1 && user)
@@ -227,7 +253,7 @@ public class Controller : MonoBehaviour
             else if (!user && (result == 2 || result == 3))
             {
                 Debug.Log("Resultado: Turno incorrecto.");
-                avatar.GetComponent<Character>().Speak(9);
+                avatar.GetComponent<Character>().Speak(10);
             }
 
             while (avatar.GetComponent<Character>().isSpeaking())
@@ -236,7 +262,6 @@ public class Controller : MonoBehaviour
             }
 
             yield return new WaitForSeconds(2f);
-
         }
     }
 }

@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
 using static Unity.Burst.Intrinsics.X86;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
-
+using RovitNacional;
 
 public class Character : MonoBehaviour
 {
-    private GameObject rightObject;
-    private GameObject leftObject;
+    [SerializeField] private GameObject rightObject;
+    [SerializeField] private GameObject leftObject;
+    [SerializeField] private GameObject test;
+
+    private string path = "";
 
     private IEnumerator moveRightHand;
     private IEnumerator moveLeftHand;
@@ -25,42 +27,45 @@ public class Character : MonoBehaviour
     private int m_TalkStateHash;
     private bool initAnim = false;
 
-    private static readonly string[] Frases = { "spanish0", "spanish1", "spanish2", "spanish3", "spanish4", 
-                                                "spanish5", "spanish6", "spanish7", "spanish8", "spanish9"};
+    private int activeMoveCoroutines = 0;
+
+    private static readonly string[] Frases = { "spanish0", "spanish1", "spanish2", "spanish3", "spanish4",
+                                                "spanish5", "spanish6", "spanish7", "spanish8", "spanish9", "spanish10"};
     public void Awake()
     {
         source = GetComponent<AudioSource>();
     }
 
+    public void setMode(Activity actividad, Mode version)
+    {
+
+        switch (actividad)
+        {
+            case Activity.BuldingTower: path = "BuildTower/"; break;
+            case Activity.GoStopGo: path = "GoStopGo/"; break;
+        }
+        switch (version)
+        {
+            case Mode.TEA: path += "TEA/"; break;
+            case Mode.AC: path += "AC/"; break;
+            case Mode.Down: path += "Down/"; break;
+        }
+    }
+
+
     public void Start()
     {
-        int child = transform.childCount;
-        for (int i = 0; i < child; i++)
-        {
-            var aux = transform.GetChild(i);
-            if (aux.name == "Right")
-            {
-                rightObject = aux.gameObject;
-            }
-            if (aux.name == "Left")
-            {
-                leftObject = aux.gameObject;
-            }
-            if (aux.name == "test")
-            {
-                anim = aux.GetComponent<Animator>();
-                m_TalkStateHash = Animator.StringToHash("Base Layer.test_Imported_4487785415424_TempMotion");
-                anim.Play(m_TalkStateHash, 0, 1f);
-            }
-        }
+        anim = test.GetComponent<Animator>();
+        m_TalkStateHash = Animator.StringToHash("Base Layer.test_Imported_4487785415424_TempMotion");
+        anim.Play(m_TalkStateHash, 0, 1f);
 
         piper = GetComponentInChildren<PiperManager>();
         source = GetComponentInChildren<AudioSource>();
     }
-    
+
     public void Update()
     {
-        if(source.isPlaying && !initAnim)
+        if (source.isPlaying && !initAnim)
         {
             initAnim = true;
             anim.Play(m_TalkStateHash, 0, 0.25f);
@@ -70,24 +75,18 @@ public class Character : MonoBehaviour
             initAnim = false;
             anim.Play(m_TalkStateHash, 0, 1f);
         }
-        //Debug.Log("Anim: " + anim.)
     }
 
-    /*public async void Speak(string text)
-    {
-        var sw = new System.Diagnostics.Stopwatch();
-        sw.Start();
-
-        var audio = piper.TextToSpeechAsync(text);
-
-        source.Stop();
-        if (source && source.clip)
-            Destroy(source.clip);
-
-        source.clip = await audio;
-        source.Play();
-    }*/
     public void Speak(int i)
+    {
+        source.Stop();
+        AudioClip clip = Resources.Load<AudioClip>("Sounds/spanish" + i);
+        Debug.Log("CLIP: " + clip.name);
+        source.PlayOneShot(clip);
+        source.PlayOneShot(clip);
+    }
+
+    public void Speak(string id)
     {
         source.Stop();
 
@@ -95,7 +94,7 @@ public class Character : MonoBehaviour
         if (source && source.clip)
             Destroy(source.clip);
         */
-        AudioClip clip = Resources.Load<AudioClip>("Sounds/spanish" + i);
+        AudioClip clip = Resources.Load<AudioClip>("Sounds/" + path + id);
         Debug.Log("CLIP: " + clip.name);
         //source.clip = clip;
 
@@ -105,6 +104,63 @@ public class Character : MonoBehaviour
     public bool isSpeaking()
     {
         return source.isPlaying;
+    }
+
+    private IEnumerator TrackMovement(IEnumerator routine)
+    {
+        activeMoveCoroutines++;
+        yield return routine;            // espera a que termine la corutina real
+        activeMoveCoroutines--;
+        if (activeMoveCoroutines < 0)    // por seguridad ante StopAllCoroutines()
+            activeMoveCoroutines = 0;
+    }
+
+    public bool isMoving()
+    {
+        return activeMoveCoroutines > 0;
+    }
+
+    public IEnumerator MoveAvatarHandTopDown(
+        GameObject go,
+        Vector3 endPoint,
+        float speed = 0.1f,
+        float overHeight = 0.15f,
+        float hoverFraction = 0.6f,
+        float stopDistance = 0.001f)
+    {
+        Transform tr = go.transform;
+        float eps2 = stopDistance * stopDistance;
+
+        Vector3 start = tr.position;
+
+        Vector2 startXZ = new Vector2(start.x, start.z);
+        Vector2 endXZ = new Vector2(endPoint.x, endPoint.z);
+        Vector2 deltaXZ = endXZ - startXZ;
+        float distXZ = deltaXZ.magnitude;
+
+        float frac = Mathf.Clamp01(hoverFraction);
+        if (distXZ > 0f)
+            frac = Mathf.Clamp(frac, 0.01f, 0.99f);
+
+        Vector2 hoverXZ = startXZ + deltaXZ * frac;
+        float hoverY = Mathf.Max(start.y, endPoint.y + overHeight);
+        Vector3 hoverPoint = new Vector3(hoverXZ.x, hoverY, hoverXZ.y);
+
+        // Fase 1
+        while ((tr.position - hoverPoint).sqrMagnitude > eps2)
+        {
+            tr.position = Vector3.MoveTowards(tr.position, hoverPoint, speed * Time.deltaTime);
+            yield return null;
+        }
+
+        // Fase 2
+        while ((tr.position - endPoint).sqrMagnitude > eps2)
+        {
+            tr.position = Vector3.MoveTowards(tr.position, endPoint, speed * Time.deltaTime);
+            yield return null;
+        }
+
+        tr.position = endPoint;
     }
 
     public IEnumerator MoveAvatarHand(GameObject gameObject, Vector3 endPoint, float speed = 0.1f)
@@ -119,21 +175,47 @@ public class Character : MonoBehaviour
 
     public void MoveRightHand(Vector3 target, float speed = 0.08f)
     {
-        moveRightHand = MoveAvatarHand(rightObject, target, speed);
-        StartCoroutine(moveRightHand);
+        moveRightHand = MoveAvatarHandTopDown(rightObject, target, speed);
+        StartCoroutine(TrackMovement(moveRightHand));
     }
 
     public void MoveLeftHand(Vector3 target, float speed = 0.08f)
     {
-        moveLeftHand = MoveAvatarHand(leftObject, target, speed);
-        StartCoroutine(moveLeftHand);
+        moveLeftHand = MoveAvatarHandTopDown(leftObject, target, speed);
+        StartCoroutine(TrackMovement(moveLeftHand));
     }
 
-    public void lookAt(Transform target)
+    public void MovePieceLeftHand(GameObject obj, Vector3 target, float speed = 0.08f)
     {
-        
+        obj.GetComponent<Tower_Piece>().SetAvatarHandPose(leftObject);
+        moveLeftHand = MoveAvatarHandTopDown(leftObject, target, speed);
+        StartCoroutine(TrackMovement(moveLeftHand));
+    }
+
+    public void MovePieceRightHand(GameObject obj, Vector3 target, float speed = 0.08f)
+    {
+        obj.GetComponent<Tower_Piece>().SetAvatarHandPose(rightObject);
+        moveRightHand = MoveAvatarHandTopDown(rightObject, target, speed);
+        StartCoroutine(TrackMovement(moveRightHand));
+    }
+
+    public void SetLeftHand(Transform target)
+    {
+        leftObject.transform.position = target.position;
+        StopAllCoroutines();
+        activeMoveCoroutines = 0;
+        //leftObject.transform.rotation = target.rotation;
+    }
+
+    public void SetRightHand(Transform target)
+    {
+        rightObject.transform.position = target.position;
+        StopAllCoroutines();
+        activeMoveCoroutines = 0;
+        //rightObject.transform.rotation = target.rotation;
     }
 }
+
 
 /*
 public class MoveObject : MonoBehaviour
