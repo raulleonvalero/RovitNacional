@@ -2,6 +2,7 @@
 using System.Collections;             // <- Necesario para IEnumerator/Coroutines
 using System.Collections.Generic;
 using static Unity.Mathematics.math;
+using RovitNacional;
 
 public class Tower_control : MonoBehaviour
 {
@@ -43,8 +44,13 @@ public class Tower_control : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        avatar.GetComponent<Character>().MoveLeftHand(left_rest.transform.position, 0.3f);
-        avatar.GetComponent<Character>().MoveRightHand(right_rest.transform.position, 0.3f);
+        var ch = avatar.GetComponent<Character>();
+
+        ch.MoveLeftHand(left_rest.transform.position, 0.3f);
+        ch.MoveRightHand(right_rest.transform.position, 0.3f);
+
+        ch.setMode(Activity.BuldingTower, Mode.TEA);
+
 
         //disable next piece at start
         next_piece.SetActive(false);
@@ -197,7 +203,7 @@ public class Tower_control : MonoBehaviour
         int result = 0;
 
         // Paso 1: Explicación del experimento
-        ch.Speak(0);
+        ch.Speak("greeting_hello_2a");
         yield return new WaitUntil(() => !ch.isSpeaking());
         yield return new WaitForSeconds(2f);
 
@@ -207,7 +213,10 @@ public class Tower_control : MonoBehaviour
             bool piezaColocada = false;
             bool turnoUsuario = Random.Range(0, 2) == 1;
 
-            ch.Speak(turnoUsuario ? 4 : 7);
+            ch.Speak(turnoUsuario ? "turn_your_turn_2a" : "turn_my_turn_2a");
+            yield return new WaitUntil(() => !ch.isSpeaking());
+
+            ch.Speak(turnoUsuario ? "action_place_cube_1a" : "action_place_cube_2a");
             yield return new WaitUntil(() => !ch.isSpeaking());
 
             if (!turnoUsuario)
@@ -310,17 +319,17 @@ public class Tower_control : MonoBehaviour
             if (result == 2 && turnoUsuario)
             {
                 Debug.Log("Resultado: Tiempo límite alcanzado.");
-                ch.Speak(1);
+                ch.Speak("error_try_again_2a");
             }
             else if (result == 3 || (result == 1 && !turnoUsuario))
             {
                 Debug.Log("Resultado: Tarea completada correctamente.");
-                ch.Speak(2);
+                ch.Speak("praise_progress_1a");
             }
             else if (result == 0)
             {
                 Debug.Log("Resultado: Turno incorrecto.");
-                ch.Speak(10);
+                ch.Speak("error_not_your_turn_2a");
             }
             yield return new WaitUntil(() => !ch.isSpeaking());
 
