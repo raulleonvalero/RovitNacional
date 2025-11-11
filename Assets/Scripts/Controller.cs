@@ -149,24 +149,23 @@ public class Controller : MonoBehaviour
                 }
             }
 
-            while (avatar.GetComponent<Character>().isSpeaking())
-            {
-                yield return null; // Espera hasta que termine de hablar
-            }
+            while (avatar.GetComponent<Character>().isSpeaking()) yield return null; // Espera hasta que termine de hablar
 
             // Paso 4: Detectar si la tarea se completa con límite de tiempo
 
             if (!user){
 
+                yield return new WaitForSeconds(3f);
+
                 lookAt(pieces[piece_id].transform);
 
                 if (pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() == spawnPoints[2]) // Si la pieza está en el spawn derecho
                 {
-                    avatar.GetComponent<Character>().MoveLeftHand(pieces[piece_id].transform.position + piece_height_offset, 0.3f);
+                    avatar.GetComponent<Character>().MoveLeftHand(pieces[piece_id].transform.position + piece_height_offset, 0.4f);
                 }
                 else
                 {
-                    avatar.GetComponent<Character>().MoveRightHand(pieces[piece_id].transform.position + piece_height_offset, 0.3f);
+                    avatar.GetComponent<Character>().MoveRightHand(pieces[piece_id].transform.position + piece_height_offset, 0.4f);
                 }
             }
 
@@ -213,22 +212,27 @@ public class Controller : MonoBehaviour
                 yield return null; // ¡No bloquear! Espera al siguiente frame
             }
 
+
+            lookAt(look_target);
+
             if (!user)
             {
-                lookAt(look_target);
-
                 if (pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() == spawnPoints[2]) // Si la pieza está en el spawn derecho
                 {
-                    avatar.GetComponent<Character>().MoveLeftHand(left_rest.transform.position, 0.5f);
+                    avatar.GetComponent<Character>().MoveLeftHand(left_rest.transform.position, 0.6f);
                 }
                 else
                 {
-
-                    avatar.GetComponent<Character>().MoveRightHand(right_rest.transform.position, 0.5f);
+                    avatar.GetComponent<Character>().MoveRightHand(right_rest.transform.position, 0.6f);
                 }
+
             }
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1.5f);
+
+            avatar.GetComponent<Character>().SetLeftHand(left_rest.transform);
+            avatar.GetComponent<Character>().SetRightHand(right_rest.transform);
+
 
             // Paso 5: Registrar resultados
             if (result == 1 && user)
