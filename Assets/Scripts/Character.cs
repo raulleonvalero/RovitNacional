@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
 using static Unity.Burst.Intrinsics.X86;
+using RovitNacional;
 
 public class Character : MonoBehaviour
 {
@@ -23,11 +24,29 @@ public class Character : MonoBehaviour
     private int m_TalkStateHash;
     private bool initAnim = false;
 
+    private string path = "";
+
     private static readonly string[] Frases = { "spanish0", "spanish1", "spanish2", "spanish3", "spanish4", 
                                                 "spanish5", "spanish6", "spanish7", "spanish8", "spanish9", "spanish10"};
     public void Awake()
     {
         source = GetComponent<AudioSource>();
+    }
+
+    public void setMode(Activity actividad, Mode version)
+    {
+
+        switch (actividad)
+        {
+            case Activity.BuldingTower: path = "BuldingTower/"; break;
+            case Activity.GoStopGo: path = "GoStopGo/"; break;
+        }
+        switch (version)
+        {
+            case Mode.TEA: path += "TEA/"; break;
+            case Mode.AC: path += "AC/"; break;
+            case Mode.Down: path += "Down/"; break;
+        }
     }
 
     public void Start()
@@ -87,13 +106,17 @@ public class Character : MonoBehaviour
     }*/
     public void Speak(int i)
     {
+        throw new System.Exception("Deprecated method: use Speak(string)");
+    }
+    public void Speak(string id)
+    {
         source.Stop();
 
         /*var clip = "Sounds/" + Frases[i] + ".wav";
         if (source && source.clip)
             Destroy(source.clip);
         */
-        AudioClip clip = Resources.Load<AudioClip>("Sounds/spanish" + i);
+        AudioClip clip = Resources.Load<AudioClip>("Sounds/" + path + id);
         Debug.Log("CLIP: " + clip.name);
         //source.clip = clip;
 
