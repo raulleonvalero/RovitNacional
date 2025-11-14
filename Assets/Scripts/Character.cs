@@ -5,6 +5,7 @@ using System.Net;
 using UnityEngine;
 using static Unity.Burst.Intrinsics.X86;
 using RovitNacional;
+using System.Linq;
 
 public class Character : MonoBehaviour
 {
@@ -77,12 +78,18 @@ public class Character : MonoBehaviour
         }
     }
 
+    public void Speak(AudioClip clip)
+    {
+        source.Stop();
+        Debug.Log("CLIP: " + clip.name);
+        source.PlayOneShot(clip);
+    }
+
     public void Speak(int i)
     {
         source.Stop();
         AudioClip clip = Resources.Load<AudioClip>("Sounds/spanish" + i);
         Debug.Log("CLIP: " + clip.name);
-        source.PlayOneShot(clip);
         source.PlayOneShot(clip);
     }
 
@@ -90,15 +97,25 @@ public class Character : MonoBehaviour
     {
         source.Stop();
 
-        /*var clip = "Sounds/" + Frases[i] + ".wav";
-        if (source && source.clip)
-            Destroy(source.clip);
-        */
-        AudioClip clip = Resources.Load<AudioClip>("Sounds/" + path + id);
-        Debug.Log("CLIP: " + clip.name);
-        //source.clip = clip;
+        // Cargar todos los clips dentro de Resources/Sounds/
+        AudioClip[] clips = Resources.LoadAll<AudioClip>("Sounds");
 
-        source.PlayOneShot(clip);
+        // Filtrar los que contienen el id en el nombre
+        var matchingClips = clips.Where(c => c.name.Contains(id)).ToList();
+
+        if (matchingClips.Count == 0)
+        {
+            Debug.LogWarning("No se encontraron clips que contengan: " + id);
+            return;
+        }
+
+        // Elegir uno aleatorio
+        AudioClip randomClip = matchingClips[Random.Range(0, matchingClips.Count)];
+
+        Debug.Log("Reproduciendo clip: " + randomClip.name);
+
+        // Reproducirlo
+        source.PlayOneShot(randomClip);
     }
 
     public bool isSpeaking()
