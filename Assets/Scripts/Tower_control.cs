@@ -28,10 +28,15 @@ public class Tower_control : MonoBehaviour
     [SerializeField] private GameObject head_look;
     [SerializeField] private Transform look_target;
 
+    [Header("GPTClient")]
+    [SerializeField] private GameObject apiController;
+    [SerializeField] private AudioSource audioSource;
+
     // Parámetros del experimento 
     [Header("Experiment")]
     [SerializeField] private float timeLimit = 15f;
     [SerializeField] bool easy_mode = true;
+    [SerializeField] string user_type = "TEA";
     private bool experimentRunning = false;
     private bool complete = false;
     private List<int> pieces_id = new List<int>();
@@ -94,11 +99,11 @@ public class Tower_control : MonoBehaviour
 
         if (easy_mode)
         {
-            tolerance = 5f; // tolerancia en grados
+            tolerance = 8.0f; // tolerancia en grados
         }
         else
         {
-            tolerance = 2f; // tolerancia en grados
+            tolerance = 3.0f; // tolerancia en grados
         }
 
         bool xOK = IsNearMultipleOf90(euler_angles.x, tolerance);
@@ -132,15 +137,15 @@ public class Tower_control : MonoBehaviour
         }
         else if (easy_mode)
         {
-            return abs(x - next_x) < 0.05f &&
-               abs(z - next_z) < 0.05f &&
-               abs(y - next_y) < 0.003f;
+            return abs(x - next_x) < 0.08f &&
+               abs(z - next_z) < 0.08f &&
+               abs(y - next_y) < 0.01f;
         }
         else
         {
-            return abs(x - next_x) < 0.02f &&
-               abs(z - next_z) < 0.02f &&
-               abs(y - next_y) < 0.002f;
+            return abs(x - next_x) < 0.04f &&
+               abs(z - next_z) < 0.04f &&
+               abs(y - next_y) < 0.005f;
         }
     }
 
@@ -203,7 +208,7 @@ public class Tower_control : MonoBehaviour
         int result = 0;
 
         // Paso 1: Explicación del experimento
-        ch.Speak("greeting_hello_2a");
+        ch.Speak("greeting_hello");
         yield return new WaitUntil(() => !ch.isSpeaking());
         yield return new WaitForSeconds(2f);
 
@@ -213,10 +218,10 @@ public class Tower_control : MonoBehaviour
             bool piezaColocada = false;
             bool turnoUsuario = Random.Range(0, 2) == 1;
 
-            ch.Speak(turnoUsuario ? "turn_your_turn_2a" : "turn_my_turn_2a");
+            ch.Speak(turnoUsuario ? "turn_your_turn" : "turn_my_turn");
             yield return new WaitUntil(() => !ch.isSpeaking());
 
-            ch.Speak(turnoUsuario ? "action_place_cube_1a" : "action_place_cube_2a");
+            ch.Speak(turnoUsuario ? "action_place_user" : "action_place_avatar");
             yield return new WaitUntil(() => !ch.isSpeaking());
 
             if (!turnoUsuario)
@@ -232,7 +237,7 @@ public class Tower_control : MonoBehaviour
                     yield break;
                 }
 
-                bool usarDerecha = randId <= 4; // si tu layout lo requiere
+                bool usarDerecha = randId < 4; // si tu layout lo requiere
 
                 // 1) Mano hacia la pieza
                 if (usarDerecha)
@@ -315,25 +320,48 @@ public class Tower_control : MonoBehaviour
                 }
             }
 
+            //La altura de la torre 
+            int altura = pieces_id.Count;
+            string turno = turnoUsuario ? "user" : "avatar";
+            string resultado = "";
+
             // Paso 5: Registrar resultados
-            if (result == 2 && turnoUsuario)
+
+            if (result == 1 && !turnoUsuario)
+            {
+                Debug.Log("Resultado: Turno avatar esperado.");
+                resultado = "WAIT";
+            }
+            else if (result == 2 && turnoUsuario)
             {
                 Debug.Log("Resultado: Tiempo límite alcanzado.");
-                ch.Speak("error_try_again_2a");
+                resultado = "OUT_OF_TIME";
             }
-            else if (result == 3 || (result == 1 && !turnoUsuario))
+            else if (result == 3)
             {
                 Debug.Log("Resultado: Tarea completada correctamente.");
-                ch.Speak("praise_progress_1a");
+                resultado = "CORRECT";
             }
             else if (result == 0)
             {
                 Debug.Log("Resultado: Turno incorrecto.");
-                ch.Speak("error_not_your_turn_2a");
+                resultado = "ERROR_TURN";
             }
-            yield return new WaitUntil(() => !ch.isSpeaking());
 
-            yield return new WaitForSeconds(2f);
+            var api = apiController.GetComponent<OpenAIAvatarDirector>();
+            api.GenerarRespuestaYAudio(altura, turno, user_type, resultado, onDone: (texto, clip) =>
+            {
+                Debug.Log("Texto del avatar: " + texto);
+
+                if (clip != null)
+                {
+                    ch.Speak(clip);
+                }
+            });
+
+            yield return new WaitForSeconds(3f);
+            yield return new WaitUntil(() => !ch.isSpeaking());
+            yield return new WaitForSeconds(5f);
         }
     }
 
