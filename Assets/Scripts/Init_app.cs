@@ -5,11 +5,17 @@ using UnityEngine.SceneManagement;
 
 public class Init_app : MonoBehaviour
 {
+    public GameObject[] NoDestroy;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         Logging.createFile();
         Logging.WriteLog(0, "APP init");
+
+        foreach(GameObject gb in NoDestroy)
+        {
+            DontDestroyOnLoad(gb);
+        }
     }
 
     public void OnLoadExperiment1()
