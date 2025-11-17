@@ -25,9 +25,6 @@ public class Tower_control : MonoBehaviour
     [SerializeField] private GameObject left_rest;
     [SerializeField] private GameObject right_rest;
 
-    [SerializeField] private GameObject head_look;
-    [SerializeField] private Transform look_target;
-
     [Header("GPTClient")]
     [SerializeField] private GameObject apiController;
     [SerializeField] private AudioSource audioSource;
@@ -137,15 +134,15 @@ public class Tower_control : MonoBehaviour
         }
         else if (easy_mode)
         {
-            return abs(x - next_x) < 0.08f &&
-               abs(z - next_z) < 0.08f &&
-               abs(y - next_y) < 0.01f;
+            return abs(x - next_x) < 0.05f &&
+               abs(z - next_z) < 0.05f &&
+               abs(y - next_y) < 0.005f;
         }
         else
         {
-            return abs(x - next_x) < 0.04f &&
-               abs(z - next_z) < 0.04f &&
-               abs(y - next_y) < 0.005f;
+            return abs(x - next_x) < 0.03f &&
+               abs(z - next_z) < 0.03f &&
+               abs(y - next_y) < 0.003f;
         }
     }
 
@@ -155,7 +152,7 @@ public class Tower_control : MonoBehaviour
 
         //Create a new base piece on the tower in the position of the placed piece
         GameObject new_base_piece = Instantiate(base_piece);
-        new_base_piece.transform.position = pieces[i].transform.position;
+        new_base_piece.transform.position = new Vector3(pieces[i].transform.position.x, next_piece.transform.position.y, pieces[i].transform.position.z);
         Quaternion ori = pieces[i].transform.rotation;
         float y_value = ori.eulerAngles.y;
         new_base_piece.transform.rotation = Quaternion.Euler(0, y_value, 0);
@@ -204,13 +201,30 @@ public class Tower_control : MonoBehaviour
         Debug.Log("Experimento iniciado.");
 
         var ch = avatar.GetComponent<Character>();
+        var api = apiController.GetComponent<OpenAIAvatarDirector>();
         int numPieces = avatar_pieces.Count;
         int result = 0;
+        int altura = 0;
+        string turno = "";
+        string ult_turno = "";
+        string resultado = string.Empty;
+        bool new_clip = false;
 
         // Paso 1: Explicación del experimento
-        ch.Speak("greeting_hello");
+        new_clip = false;
+        api.GenerarRespuestaYAudio(altura, turno, ult_turno, user_type, resultado, "EXPLICAR_EXPERIMENTO", onDone: (texto, clip) =>
+        {
+            Debug.Log("Texto del avatar: " + texto);
+
+            if (clip != null)
+            {
+                new_clip = true;
+                ch.Speak(clip);
+            }
+        });
+
+        yield return new WaitUntil(() => new_clip);
         yield return new WaitUntil(() => !ch.isSpeaking());
-        yield return new WaitForSeconds(2f);
 
         // Bucle principal: hasta tener 9 piezas colocadas
         while (pieces_id.Count < 9)
@@ -218,10 +232,22 @@ public class Tower_control : MonoBehaviour
             bool piezaColocada = false;
             bool turnoUsuario = Random.Range(0, 2) == 1;
 
-            ch.Speak(turnoUsuario ? "turn_your_turn" : "turn_my_turn");
-            yield return new WaitUntil(() => !ch.isSpeaking());
+            altura = pieces_id.Count + 1;
+            turno = turnoUsuario ? "user" : "avatar";
 
-            ch.Speak(turnoUsuario ? "action_place_user" : "action_place_avatar");
+            new_clip = false;
+            api.GenerarRespuestaYAudio(altura, turno, ult_turno, user_type, resultado, "INDICAR_TURNO_ACTUAL", onDone: (texto, clip) =>
+            {
+                Debug.Log("Texto del avatar: " + texto);
+
+                if (clip != null)
+                {
+                    new_clip = true;
+                    ch.Speak(clip);
+                }
+            });
+
+            yield return new WaitUntil(() => new_clip);
             yield return new WaitUntil(() => !ch.isSpeaking());
 
             if (!turnoUsuario)
@@ -320,11 +346,6 @@ public class Tower_control : MonoBehaviour
                 }
             }
 
-            //La altura de la torre 
-            int altura = pieces_id.Count;
-            string turno = turnoUsuario ? "user" : "avatar";
-            string resultado = "";
-
             // Paso 5: Registrar resultados
 
             if (result == 1 && !turnoUsuario)
@@ -348,20 +369,22 @@ public class Tower_control : MonoBehaviour
                 resultado = "ERROR_TURN";
             }
 
-            var api = apiController.GetComponent<OpenAIAvatarDirector>();
-            api.GenerarRespuestaYAudio(altura, turno, user_type, resultado, onDone: (texto, clip) =>
+            new_clip = false;
+            api.GenerarRespuestaYAudio(altura, turno, ult_turno, user_type, resultado, "FEEDBACK_RESULTADO", onDone: (texto, clip) =>
             {
                 Debug.Log("Texto del avatar: " + texto);
 
                 if (clip != null)
                 {
+                    new_clip = true;
                     ch.Speak(clip);
                 }
             });
 
-            yield return new WaitForSeconds(3f);
+            yield return new WaitUntil(() => new_clip);
             yield return new WaitUntil(() => !ch.isSpeaking());
-            yield return new WaitForSeconds(5f);
+
+            ult_turno = turno;
         }
     }
 

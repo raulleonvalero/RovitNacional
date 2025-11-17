@@ -14,9 +14,6 @@ public class Controller : MonoBehaviour
     [SerializeField] private GameObject left_rest;
     [SerializeField] private GameObject right_rest;
 
-    [SerializeField] private GameObject head_look;
-    [SerializeField] private Transform look_target;
-
     [Header("Experimento")]
     [SerializeField] private float timeLimit = 15f;
 
@@ -38,8 +35,6 @@ public class Controller : MonoBehaviour
         ch.MoveRightHand(right_rest.transform.position, 0.3f);
 
         ch.setMode(Activity.GoStopGo, Mode.TEA);
-
-        lookAt(look_target);
     }
 
     public void OnStartExperimentButtonPressed()
@@ -93,11 +88,6 @@ public class Controller : MonoBehaviour
                 piece.transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
             }
         }
-    }
-
-    private void lookAt(Transform target)
-    {
-        //head_look.GetComponent<IKControl>().lookObj = target;
     }
 
     IEnumerator ExperimentRoutine()
@@ -158,8 +148,6 @@ public class Controller : MonoBehaviour
 
                 yield return new WaitForSeconds(3f);
 
-                lookAt(pieces[piece_id].transform);
-
                 if (pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() == spawnPoints[2]) // Si la pieza está en el spawn derecho
                 {
                     ch.MoveLeftHand(pieces[piece_id].transform.position + piece_height_offset, 0.4f);
@@ -212,9 +200,6 @@ public class Controller : MonoBehaviour
 
                 yield return null; // ¡No bloquear! Espera al siguiente frame
             }
-
-
-            lookAt(look_target);
 
             if (!user)
             {
