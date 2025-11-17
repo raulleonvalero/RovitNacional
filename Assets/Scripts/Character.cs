@@ -1,4 +1,4 @@
-using Piper;
+//using Piper;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -21,7 +21,7 @@ public class Character : MonoBehaviour
     private Vector3 originPos;
 
     private AudioSource source;
-    private PiperManager piper;
+    //private PiperManager piper;
 
     private Animator anim;
 
@@ -60,7 +60,7 @@ public class Character : MonoBehaviour
         m_TalkStateHash = Animator.StringToHash("Base Layer.test_Imported_4487785415424_TempMotion");
         anim.Play(m_TalkStateHash, 0, 1f);
 
-        piper = GetComponentInChildren<PiperManager>();
+        //piper = GetComponentInChildren<PiperManager>();
         source = GetComponentInChildren<AudioSource>();
     }
 

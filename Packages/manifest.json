@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.abuksigun.piper": "https://github.com/mrtrizer/UnityPiper.git",
     "com.meta.xr.sdk.all": "78.0.0",
     "com.unity.ai.inference": "2.2.1",
     "com.unity.ai.navigation": "2.0.9",
@@ -14,6 +15,7 @@
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.7",
     "com.unity.xr.openxr": "1.15.1",
+    "com.whisper.unity": "https://github.com/Macoron/whisper.unity.git?path=/Packages/com.whisper.unity",
     "org.nesnausk.gaussian-splatting": "file:../Packages",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.ai": "1.0.0",

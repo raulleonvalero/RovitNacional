@@ -1,4 +1,4 @@
-using Piper;
+//using Piper;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -17,7 +17,7 @@ public class movement : MonoBehaviour
     //public Camera characterCamera;
     public GameObject characterBody;
 
-    public PiperManager piper;
+    //public PiperManager piper;
     public AudioSource audioSpeaker;
 
     public GameObject rightObject;
