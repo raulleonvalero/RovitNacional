@@ -12,7 +12,8 @@ public class multi_display : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        gameObject.transform.position = central.transform.position;
-        gameObject.transform.rotation = central.transform.rotation;
+
+        Camera.main.transform.position = central.transform.position;
+        Camera.main.transform.rotation = central.transform.rotation;
     }
 }

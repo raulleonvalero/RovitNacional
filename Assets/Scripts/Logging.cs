@@ -16,9 +16,10 @@ namespace RovitNacional
             DirectoryInfo directory  = Directory.CreateDirectory(Path.GetDirectoryName(logFile));
 
         }
-        public static void WriteLog(int level, string message)
+        public static string WriteLog(int level, string message)
         {
             string loglevel;
+            string log;
 
             switch (level)
             {
@@ -32,9 +33,10 @@ namespace RovitNacional
             using (StreamWriter sw = new StreamWriter(logFile, true))
             {
                 // Add some text to the file.
-                sw.WriteLine("[" + DateTime.Now.ToString("HH:mm:ss") + "][" + loglevel + "] - " + message);
+                log = "[" + DateTime.Now.ToString("HH:mm:ss") + "][" + loglevel + "] - " + message;
+                sw.WriteLine(log);
             }
-
+            return log;
         }
     }
 }

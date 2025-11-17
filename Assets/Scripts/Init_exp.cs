@@ -6,6 +6,7 @@ using UnityEngine.TextCore.Text;
 
 public class Init_exp : MonoBehaviour
 {
+    public TextMeshProUGUI output;
     public TextMeshProUGUI Actividad;
     public TextMeshProUGUI Modo;
 
@@ -14,6 +15,7 @@ public class Init_exp : MonoBehaviour
     void Start()
     {
         jumpAction = InputSystem.actions.FindAction("Jump");
+        
     }
 
     // Update is called once per frame

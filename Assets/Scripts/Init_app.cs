@@ -10,13 +10,21 @@ public class Init_app : MonoBehaviour
 {
     public GameObject[] NoDestroy;
 
+    public static  TextMeshProUGUI output;
     public TextMeshProUGUI actividad;
     public TextMeshProUGUI modo;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        TextMeshProUGUI[] textos = GameObject.FindObjectsByType<TextMeshProUGUI>(FindObjectsSortMode.InstanceID);
+        foreach (var t in textos)
+        {
+            Debug.Log("Textos: " + t.name);
+            if (t.name == "TextOut")
+                output = t;
+        }
         Logging.createFile();
-        Logging.WriteLog(0, "APP init");
+        output.text += Logging.WriteLog(0, "APP init");
 
         foreach(GameObject gb in NoDestroy)
         {
