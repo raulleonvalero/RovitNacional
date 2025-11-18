@@ -40,6 +40,8 @@ public class Controller : MonoBehaviour
         ch.setMode(Activity.GoStopGo, Mode.TEA);
 
         lookAt(look_target);
+
+        Logging.WriteLog((int)Activity.GoStopGo, -1, "Excena GoStopGo Iniciada");
     }
 
     public void OnStartExperimentButtonPressed()
@@ -103,10 +105,14 @@ public class Controller : MonoBehaviour
     IEnumerator ExperimentRoutine()
     {
         Debug.Log("Experimento iniciado.");
+        Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Experimento Iniciado");
+
         var ch = avatar.GetComponent<Character>();
 
         // Paso 1: Explicación del experimento
         ch.Speak("greeting_hello");
+
+        Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Explicacion del experimento");
 
         while (ch.isSpeaking()) yield return null;
 
@@ -126,8 +132,17 @@ public class Controller : MonoBehaviour
             user = Random.Range(0, 2) == 1;                  // true = user, false = avatar
             piece_id = Random.Range(0, Mathf.Max(1, pieces.Count));
 
-            if (!user) ch.Speak("turn_my_turn");
-            else ch.Speak("turn_your_turn");
+            Logging.WriteLog((int)Experimento.Actividad, -1, "Spawn de Figuras listo");
+
+            if (!user) 
+            { ch.Speak("turn_my_turn");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Turno del Avatar");
+            }
+            else
+            {
+                ch.Speak("turn_your_turn");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Turno del Usuario");
+            } 
 
             while (ch.isSpeaking()) yield return null;
 
@@ -139,7 +154,7 @@ public class Controller : MonoBehaviour
 
                 else if (piece_id == 1) ch.Speak("action_touch_sphere_blue_user");
 
-                else if (piece_id == 2) ch.Speak("action_touch_cylinder_green_avatar");
+                else if (piece_id == 2) ch.Speak("action_touch_cylinder_green_user");
             }
             else
             {
@@ -182,6 +197,7 @@ public class Controller : MonoBehaviour
                 {
                     result = 1; // Tiempo límite alcanzado
                     Debug.Log("Tiempo límite alcanzado. Tarea no completada.");
+                    Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Tiempo Limite El Usuario no ha tocado la Pieza a tiempo");
                     complete = true;
                     break;
                 }
@@ -199,12 +215,14 @@ public class Controller : MonoBehaviour
                             complete = true;
                             result = 2; // Tarea completada correctamente
                             Debug.Log("Tarea completada correctamente.");
+                            Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Tarea completada correctamente");
                         }
                         else
                         {
                             complete = true;
                             result = 3; // Pieza incorrecta seleccionada
                             Debug.Log("Pieza incorrecta seleccionada.");
+                            Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Pieza incorrecta Seleccionada");
                         }
                         break;
                     }
@@ -238,26 +256,31 @@ public class Controller : MonoBehaviour
             if (result == 1 && user)
             {
                 Debug.Log("Resultado: Tiempo límite alcanzado.");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Tiempo Limite Alcanzado");
                 ch.Speak("notice_objects_move");
             }
             else if (result == 1 && !user)
             {
                 Debug.Log("Resultado: Tarea completada correctamente.");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Tarea completada Exitosamente");
                 ch.Speak("praise_wait_turn");
             }
             else if (!user && (result == 2 || result == 3))
             {
                 Debug.Log("Resultado: Turno incorrecto.");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Turno Incorrecto");
                 ch.Speak("error_wait_turn");
             }
             else if (user && result == 2)
             {
                 Debug.Log("Resultado: Tarea completada correctamente.");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Tarea completada Exitosamente");
                 ch.Speak("praise_good_job");
             }
             else if (user && result == 3)
             {
                 Debug.Log("Resultado: Pieza incorrecta seleccionada.");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Pieza Incorrecta");
                 ch.Speak("error_wrong_object");
             }
 

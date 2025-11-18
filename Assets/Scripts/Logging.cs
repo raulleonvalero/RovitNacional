@@ -16,24 +16,32 @@ namespace RovitNacional
             DirectoryInfo directory  = Directory.CreateDirectory(Path.GetDirectoryName(logFile));
 
         }
-        public static string WriteLog(int level, string message)
+        public static string WriteLog(int actividad,int modo, string message)
         {
             string loglevel;
+            string logActivity;
             string log;
 
-            switch (level)
+            switch (modo)
             {
-                case 0: loglevel = "INFO"; break;
-                case 1: loglevel = "WARNING"; break;
-                case 2: loglevel = "ERROR"; break;
-                default: loglevel = "INFO"; break;
+                case 0: loglevel = "TEA"; break;
+                case 1: loglevel = "Sindrome de Down"; break;
+                case 2: loglevel = "Altas Capacidades"; break;
+                default: loglevel = "System"; break;
+            }
+            switch (actividad)
+            {
+                case 0: logActivity = "Building Tower"; break;
+                case 1: logActivity = "Go Stop Go"; break;
+                default: logActivity = "No Activity"; break;
             }
 
             //StreamWriter sw = new StreamWriter(logPath);
             using (StreamWriter sw = new StreamWriter(logFile, true))
             {
                 // Add some text to the file.
-                log = "[" + DateTime.Now.ToString("HH:mm:ss") + "][" + loglevel + "] - " + message;
+                log = "[" + DateTime.Now.ToString("HH:mm:ss") + "][" + logActivity + "][" + loglevel + "] - " + message;
+                Variables.logOutput += log + "\n";
                 sw.WriteLine(log);
             }
             return log;

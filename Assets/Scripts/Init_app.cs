@@ -1,30 +1,38 @@
-using UnityEngine;
 using RovitNacional;
-
+using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
-using TMPro;
+
 
 public class Init_app : MonoBehaviour
 {
     public GameObject[] NoDestroy;
 
-    public static  TextMeshProUGUI output;
+    public TextMeshProUGUI output;
     public TextMeshProUGUI actividad;
     public TextMeshProUGUI modo;
+
+    public ScrollRect scrollView;
+
+    private bool inExperiment = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    
     void Start()
     {
         TextMeshProUGUI[] textos = GameObject.FindObjectsByType<TextMeshProUGUI>(FindObjectsSortMode.InstanceID);
         foreach (var t in textos)
         {
             Debug.Log("Textos: " + t.name);
-            if (t.name == "TextOut")
+            if (t.name == "Content")
                 output = t;
         }
+
         Logging.createFile();
-        output.text += Logging.WriteLog(0, "APP init");
+        Logging.WriteLog(-1,-1, "APP init");
 
         foreach(GameObject gb in NoDestroy)
         {
@@ -47,12 +55,27 @@ public class Init_app : MonoBehaviour
             case "Sindrome de Down": Experimento.Modo = Mode.Down; break;
             case "Altas Capacidades": Experimento.Modo = Mode.AC; break;
         }
-
+        Logging.WriteLog(-1,-1, "Cargando Exeprimento");
+        inExperiment = true;
         if (Experimento.Actividad == Activity.GoStopGo)
             SceneManager.LoadScene("Experiment_1");
         if (Experimento.Actividad == Activity.BuldingTower)
             SceneManager.LoadScene("Experiment_2");
 
+    }
+
+    public void OnButtonQuitClick()
+    {
+        if (inExperiment)
+        {
+            SceneManager.LoadScene("MainScene");
+            inExperiment = false;
+        }
+        else
+        {
+            Debug.Log("Exit . . .");
+            Application.Quit();
+        }
     }
 
     public void OnLoadExperiment1()
@@ -69,6 +92,7 @@ public class Init_app : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        output.text = Variables.logOutput;
+        scrollView.normalizedPosition = new Vector2(0, 0);
     }
 }
