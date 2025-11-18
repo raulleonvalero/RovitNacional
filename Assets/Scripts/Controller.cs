@@ -23,7 +23,7 @@ public class Controller : MonoBehaviour
     [SerializeField] string user_type = "TEA";
     [SerializeField] int num_trials = 10;
 
-    // Parámetros del experimento
+    // Parï¿½metros del experimento
     private int current_trial = 0;
     private bool experimentRunning = false;
     private bool user = false;
@@ -40,7 +40,11 @@ public class Controller : MonoBehaviour
         ch.MoveLeftHand(left_rest.transform.position, 0.3f);
         ch.MoveRightHand(right_rest.transform.position, 0.3f);
 
-        //ch.setMode(Activity.GoStopGo, Mode.TEA);
+        ch.setMode(Activity.GoStopGo, Mode.TEA);
+
+        lookAt(look_target);
+
+        Logging.WriteLog((int)Activity.GoStopGo, -1, "Excena GoStopGo Iniciada");
     }
 
     public void OnStartExperimentButtonPressed()
@@ -90,7 +94,7 @@ public class Controller : MonoBehaviour
             }
             else
             {
-                // Colocación directa si no hay SimpleRespawn
+                // Colocaciï¿½n directa si no hay SimpleRespawn
                 piece.transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
             }
         }
@@ -123,37 +127,26 @@ public class Controller : MonoBehaviour
     IEnumerator ExperimentRoutine()
     {
         Debug.Log("Experimento iniciado.");
+        Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Experimento Iniciado");
 
         var ch = avatar.GetComponent<Character>();
-        var api = apiController.GetComponent<OpenAIAvatarDirector>();
 
-        int result = 0;
+        // Paso 1: Explicaciï¿½n del experimento
+        ch.Speak("greeting_hello");
 
-        string turno = "";
-        string ult_turno = "";
+        Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Explicacion del experimento");
 
-        string resultado = "";
-        string ult_resultado = "";
-        int last_piece_id = -1;
+        while (ch.isSpeaking()) yield return null;
 
-        bool new_clip = false;
+        yield return new WaitForSeconds(0.5f);
 
-        new_clip = false;
-        api.GeneratePiecesResponseAndAudio(user_type, PieceName(piece_id), turno, ult_turno, resultado, ult_resultado, "EXPLICAR_EXPERIMENTO", onDone: (texto, clip) =>
-        {
-            Debug.Log("Texto del avatar: " + texto);
+        ch.Speak("explain");
 
-            if (clip != null)
-            {
-                new_clip = true;
-                ch.Speak(clip);
-            }
-        });
+        while (ch.isSpeaking()) yield return null;
 
-        yield return new WaitUntil(() => new_clip);
-        yield return new WaitUntil(() => !ch.isSpeaking());
+        yield return new WaitForSeconds(0.5f);
 
-        while (true) // bucle de trials; si quieres número fijo, reemplaza por for (int t=0; t<T; t++)
+        while (true) // bucle de trials; si quieres nï¿½mero fijo, reemplaza por for (int t=0; t<T; t++)
         {
             SetRandomSpawns();
 
@@ -173,6 +166,29 @@ public class Controller : MonoBehaviour
             else if (ult_resultado == "ERROR_TURN")
             {
                 User_turn = false;
+            Logging.WriteLog((int)Experimento.Actividad, -1, "Spawn de Figuras listo");
+
+            if (!user) 
+            { ch.Speak("turn_my_turn");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Turno del Avatar");
+            }
+            else
+            {
+                ch.Speak("turn_your_turn");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Turno del Usuario");
+            } 
+
+            while (ch.isSpeaking()) yield return null;
+
+            yield return new WaitForSeconds(0.5f);
+
+            if (user)
+            {
+                if (piece_id == 0) ch.Speak("action_touch_cube_red_user");
+
+                else if (piece_id == 1) ch.Speak("action_touch_sphere_blue_user");
+
+                else if (piece_id == 2) ch.Speak("action_touch_cylinder_green_user");
             }
 
             else
@@ -214,7 +230,7 @@ public class Controller : MonoBehaviour
             if (!User_turn)
             {
 
-                bool use_right = pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() != spawnPoints[2]; // Si la pieza está en el spawn derecho
+                bool use_right = pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() != spawnPoints[2]; // Si la pieza estï¿½ en el spawn derecho
 
                 if (!touchedPiece)
                 {
@@ -277,6 +293,14 @@ public class Controller : MonoBehaviour
                         complete = true;
                         break;
                     }
+                if (timer >= timeLimit)
+                {
+                    result = 1; // Tiempo lï¿½mite alcanzado
+                    Debug.Log("Tiempo lï¿½mite alcanzado. Tarea no completada.");
+                    Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Tiempo Limite El Usuario no ha tocado la Pieza a tiempo");
+                    complete = true;
+                    break;
+                }
 
                     for (int i = 0; i < pieces.Count; i++)
                     {
@@ -291,8 +315,22 @@ public class Controller : MonoBehaviour
                             break;
                         }
                     }
+                            result = 2; // Tarea completada correctamente
+                            Debug.Log("Tarea completada correctamente.");
+                            Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Tarea completada correctamente");
+                        }
+                        else
+                        {
+                            complete = true;
+                            result = 3; // Pieza incorrecta seleccionada
+                            Debug.Log("Pieza incorrecta seleccionada.");
+                            Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Pieza incorrecta Seleccionada");
+                        }
+                        break;
+                    }
+                }
 
-                    yield return null; // ¡No bloquear! Espera al siguiente frame
+                    yield return null; // ï¿½No bloquear! Espera al siguiente frame
                 }
             }
 
@@ -328,6 +366,19 @@ public class Controller : MonoBehaviour
 
             new_clip = false;
             api.GeneratePiecesResponseAndAudio(user_type, PieceName(piece_id), turno, ult_turno, resultado, ult_resultado, "FEEDBACK_RESULTADO", onDone: (texto, clip) =>
+            if (result == 1 && user)
+            {
+                Debug.Log("Resultado: Tiempo lï¿½mite alcanzado.");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Tiempo Limite Alcanzado");
+                ch.Speak("notice_objects_move");
+            }
+            else if (result == 1 && !user)
+            {
+                Debug.Log("Resultado: Tarea completada correctamente.");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Tarea completada Exitosamente");
+                ch.Speak("praise_wait_turn");
+            }
+            else if (!user && (result == 2 || result == 3))
             {
                 Debug.Log("Texto del avatar: " + texto);
 
@@ -369,7 +420,7 @@ public class Controller : MonoBehaviour
         const float hardTimeout = 10f;
         float t = 0f;
 
-        // Salida inmediata si ya se cumplió la condición antes de empezar
+        // Salida inmediata si ya se cumpliï¿½ la condiciï¿½n antes de empezar
         if (shouldStop != null && shouldStop())
             yield break;
 
@@ -380,6 +431,17 @@ public class Controller : MonoBehaviour
 
             t += Time.deltaTime;
             if (t >= hardTimeout)
+                Debug.Log("Resultado: Turno incorrecto.");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Turno Incorrecto");
+                ch.Speak("error_wait_turn");
+            }
+            else if (user && result == 2)
+            {
+                Debug.Log("Resultado: Tarea completada correctamente.");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Tarea completada Exitosamente");
+                ch.Speak("praise_good_job");
+            }
+            else if (user && result == 3)
             {
                 Debug.LogWarning("Timeout de movimiento alcanzado.");
                 yield break;
@@ -393,9 +455,13 @@ public class Controller : MonoBehaviour
         const float hardTimeout = 10f;
         float t = 0f;
 
-        // Salida inmediata si ya se cumplió la condición antes de empezar
+        // Salida inmediata si ya se cumpliï¿½ la condiciï¿½n antes de empezar
         if (shouldStop != null && shouldStop())
             yield break;
+                Debug.Log("Resultado: Pieza incorrecta seleccionada.");
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Pieza Incorrecta");
+                ch.Speak("error_wrong_object");
+            }
 
         while (ch.isSpeaking())
         {

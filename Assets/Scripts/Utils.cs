@@ -4,15 +4,15 @@ namespace RovitNacional
 {
     public enum Mode
     {
-        TEA,
-        Down,
-        AC
+        TEA = 0,
+        Down = 1,
+        AC = 2
     }
 
     public enum Activity
     {
-        BuldingTower,
-        GoStopGo
+        BuldingTower = 0,
+        GoStopGo = 1
     }
 
     public static class Experimento
@@ -33,4 +33,9 @@ namespace RovitNacional
         }
         
     }
+
+    public static class Variables
+    {
+        public static string logOutput;
+    }    
 }
