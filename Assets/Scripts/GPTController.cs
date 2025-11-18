@@ -34,22 +34,6 @@ public class TestTextToAudio : MonoBehaviour
 
     public void Probar()
     {
-        var director = apiController.GetComponent<OpenAIAvatarDirector>();
-        // Ejemplo: torre a altura 0, turno del avatar, usuario TEA, resultado ERROR_TURN
-        director.GenerarRespuestaYAudio(
-            altura: 0,
-            turno: "avatar",
-            usuario: "TEA",
-            resultado: "ERROR_TURN",
-            onDone: (texto, clip) =>
-            {
-                Debug.Log("Texto del avatar: " + texto);
-
-                if (clip != null)
-                {
-                    audioSource.clip = clip;
-                    audioSource.Play();
-                }
-            });
+        
     }
 }

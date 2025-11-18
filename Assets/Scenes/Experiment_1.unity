@@ -2484,14 +2484,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b0030b47ca80ed44b32bdc601eb4b49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Piper.PiperManager
-  modelAsset: {fileID: 5022602860645237092, guid: c5c4b03e0dbca4548be0bb890ca86677, type: 3}
-  sampleRate: 22050
-  scaleSpeed: 1
-  scalePitch: 1
-  scaleGlottal: 0.8
-  espeakNgRelativePath: espeak-ng-data
-  voice: en-us
-  backendType: 257
 --- !u!4 &372165563
 Transform:
   m_ObjectHideFlags: 0
@@ -4758,7 +4750,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &698222123
 Transform:
   m_ObjectHideFlags: 0
@@ -9009,6 +9001,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1253860732}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1311686986
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1311686988}
+  - component: {fileID: 1311686987}
+  m_Layer: 0
+  m_Name: ChatGPTClient
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1311686987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1311686986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7cb7fbdf7911e74a995ca33f9b640c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OpenAIClient
+--- !u!4 &1311686988
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1311686986}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1325311389
 GameObject:
   m_ObjectHideFlags: 0
@@ -9080,9 +9116,11 @@ MonoBehaviour:
   avatar: {fileID: 85298123}
   left_rest: {fileID: 497948906}
   right_rest: {fileID: 527854807}
-  head_look: {fileID: 2025494610}
-  look_target: {fileID: 497027703}
+  apiController: {fileID: 1311686986}
+  audioSource: {fileID: 752970972}
   timeLimit: 5
+  user_type: TEA
+  num_trials: 10
 --- !u!4 &1335086041
 Transform:
   m_ObjectHideFlags: 0
@@ -13914,7 +13952,7 @@ GameObject:
   - component: {fileID: 744043527130597220}
   - component: {fileID: 2592901671696806280}
   - component: {fileID: 3180211267123998302}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: BasicPokeToyButtonPressAudio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13962,7 +14000,7 @@ GameObject:
   - component: {fileID: 1477249568980184503}
   - component: {fileID: 4406973821964573531}
   - component: {fileID: 3670715510187295885}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: BasicPokeToyButtonReleaseAudio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14075,7 +14113,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5687583376856139359}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Audio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14547,7 +14585,7 @@ GameObject:
   - component: {fileID: 5699160566573030466}
   - component: {fileID: 5699160566573030465}
   - component: {fileID: 4795316429016374150}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14580,7 +14618,7 @@ GameObject:
   - component: {fileID: 5699160566632655340}
   - component: {fileID: 7994102344006491009}
   - component: {fileID: 4432606191546957460}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Surface
   m_TagString: Untagged
   m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
@@ -14612,7 +14650,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5699160566846392690}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14629,7 +14667,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5699160567198885223}
   - component: {fileID: 5699160567198885220}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: ButtonVisual
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -14693,7 +14731,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5699160567366017282}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: RedButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14782,7 +14820,7 @@ GameObject:
   - component: {fileID: 5699160567403642774}
   - component: {fileID: 5699160567403642772}
   - component: {fileID: 5699160567403642773}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: ButtonRing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14871,7 +14909,7 @@ GameObject:
   - component: {fileID: 5699160567548643338}
   - component: {fileID: 5699160567548643336}
   - component: {fileID: 5699160567548643337}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: ButtonRingShadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14903,7 +14941,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5699160567555328677}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15034,7 +15072,7 @@ GameObject:
   - component: {fileID: 5699160567775876368}
   - component: {fileID: 5699160567775876369}
   - component: {fileID: 5699160567775876370}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15179,6 +15217,7 @@ SceneRoots:
   - {fileID: 7869954278710166608}
   - {fileID: 849479389}
   - {fileID: 339515351}
+  - {fileID: 1311686988}
   - {fileID: 1335086041}
   - {fileID: 85298126}
   - {fileID: 5699160567366017282}

@@ -25,9 +25,6 @@ public class Tower_control : MonoBehaviour
     [SerializeField] private GameObject left_rest;
     [SerializeField] private GameObject right_rest;
 
-    [SerializeField] private GameObject head_look;
-    [SerializeField] private Transform look_target;
-
     [Header("GPTClient")]
     [SerializeField] private GameObject apiController;
     [SerializeField] private AudioSource audioSource;
@@ -137,15 +134,15 @@ public class Tower_control : MonoBehaviour
         }
         else if (easy_mode)
         {
-            return abs(x - next_x) < 0.08f &&
-               abs(z - next_z) < 0.08f &&
-               abs(y - next_y) < 0.01f;
+            return abs(x - next_x) < 0.05f &&
+               abs(z - next_z) < 0.05f &&
+               abs(y - next_y) < 0.005f;
         }
         else
         {
-            return abs(x - next_x) < 0.04f &&
-               abs(z - next_z) < 0.04f &&
-               abs(y - next_y) < 0.005f;
+            return abs(x - next_x) < 0.03f &&
+               abs(z - next_z) < 0.03f &&
+               abs(y - next_y) < 0.003f;
         }
     }
 
@@ -155,7 +152,7 @@ public class Tower_control : MonoBehaviour
 
         //Create a new base piece on the tower in the position of the placed piece
         GameObject new_base_piece = Instantiate(base_piece);
-        new_base_piece.transform.position = pieces[i].transform.position;
+        new_base_piece.transform.position = new Vector3(pieces[i].transform.position.x, next_piece.transform.position.y, pieces[i].transform.position.z);
         Quaternion ori = pieces[i].transform.rotation;
         float y_value = ori.eulerAngles.y;
         new_base_piece.transform.rotation = Quaternion.Euler(0, y_value, 0);
@@ -170,6 +167,7 @@ public class Tower_control : MonoBehaviour
 
     private void PlaceAvatarPiece(int i)
     {
+        pieces_id.Add(i + avatar_pieces.Count); // ajustar el id para diferenciar de las piezas del usuario
         //Create a new base piece on the tower in the position of the placed piece
         GameObject new_base_piece = Instantiate(base_piece);
         new_base_piece.transform.position = avatar_pieces[i].transform.position;
@@ -204,27 +202,79 @@ public class Tower_control : MonoBehaviour
         Debug.Log("Experimento iniciado.");
 
         var ch = avatar.GetComponent<Character>();
+        var api = apiController.GetComponent<OpenAIAvatarDirector>();
         int numPieces = avatar_pieces.Count;
         int result = 0;
+        int altura = 0;
+        string turno = "";
+        string ult_turno = "";
+        string resultado = string.Empty;
+        string ult_resultado = string.Empty;
+        bool new_clip = false;
 
         // Paso 1: Explicación del experimento
-        ch.Speak("greeting_hello");
-        yield return new WaitUntil(() => !ch.isSpeaking());
-        yield return new WaitForSeconds(2f);
-
-        // Bucle principal: hasta tener 9 piezas colocadas
-        while (pieces_id.Count < 9)
+        new_clip = false;
+        api.GenerateTowerResponseAndAudio(altura, turno, ult_turno, user_type, resultado, ult_resultado, "EXPLICAR_EXPERIMENTO", onDone: (texto, clip) =>
         {
+            Debug.Log("Texto del avatar: " + texto);
+
+            if (clip != null)
+            {
+                new_clip = true;
+                ch.Speak(clip);
+            }
+        });
+
+        yield return new WaitUntil(() => new_clip);
+        yield return new WaitUntil(() => !ch.isSpeaking());
+
+        // Bucle principal: hasta tener 8 piezas colocadas
+        while (pieces_id.Count < 8)
+        {
+
             bool piezaColocada = false;
-            bool turnoUsuario = Random.Range(0, 2) == 1;
+            bool User_turn;
 
-            ch.Speak(turnoUsuario ? "turn_your_turn" : "turn_my_turn");
+            if (ult_resultado == "ERROR_TURN")
+            {
+                User_turn = false;
+            }
+
+            else
+            {
+                if (ult_turno == "usuario")
+                    User_turn = (Random.Range(0, 4) <= 2) ? false : true;
+                else
+                    User_turn = (Random.Range(0, 4) > 2) ? false : true;
+            }
+
+            turno = User_turn ? "usuario" : "avatar";
+
+            new_clip = false;
+            api.GenerateTowerResponseAndAudio(altura, turno, ult_turno, user_type, resultado, ult_resultado, "INDICAR_TURNO_ACTUAL", onDone: (texto, clip) =>
+            {
+                Debug.Log("Texto del avatar: " + texto);
+
+                if (clip != null)
+                {
+                    new_clip = true;
+                    ch.Speak(clip);
+                }
+            });
+            
+            yield return new WaitUntil(() => new_clip);
             yield return new WaitUntil(() => !ch.isSpeaking());
 
-            ch.Speak(turnoUsuario ? "action_place_user" : "action_place_avatar");
-            yield return new WaitUntil(() => !ch.isSpeaking());
+            for (int i = 0; i < pieces.Count; i++)
+            {
+                if (pieces[i] != null)
+                {
+                    var piece_control = pieces[i].GetComponent<Tower_Piece>();
+                    piece_control.Respawn();
+                }
+            }
 
-            if (!turnoUsuario)
+            if (!User_turn)
             {
                 // Turno del avatar (robot)
                 yield return new WaitForSeconds(3f);
@@ -266,15 +316,18 @@ public class Tower_control : MonoBehaviour
                 });
 
                 // Registrar pieza usada (ajuste si necesitas sumarle numPieces)
-                pieces_id.Add(randId + numPieces);
+                if (!piezaColocada)
+                {
+                    PlaceAvatarPiece(randId);
+                    result = 1;
 
-                // Volver a la pose de reposo
-                if (usarDerecha)
-                    ch.MoveRightHand(right_rest.transform.position, 0.6f);
+                    // Volver a la pose de reposo
+                    if (usarDerecha)
+                        ch.MoveRightHand(right_rest.transform.position, 0.6f);
+                    else
+                        ch.MoveLeftHand(left_rest.transform.position, 0.6f);
+                }
                 else
-                    ch.MoveLeftHand(left_rest.transform.position, 0.6f);
-
-                if (piezaColocada) 
                 {
                     result = 0;
                     var piece_control = avatar_pieces[randId].GetComponent<Tower_Piece>();
@@ -283,11 +336,6 @@ public class Tower_control : MonoBehaviour
 
                     if (usarDerecha) ch.SetRightHand(right_rest.transform);
                     else ch.SetLeftHand(left_rest.transform);
-                }
-                else 
-                {
-                    result = 1;
-                    PlaceAvatarPiece(randId);
                 }
             }
             else
@@ -302,7 +350,6 @@ public class Tower_control : MonoBehaviour
 
                     if (timer >= timeLimit)
                     {
-                        Debug.Log("Tiempo límite alcanzado. Tarea no completada.");
                         result = 2; // si necesitas guardar el resultado
                         complete = true;
                         break;
@@ -320,52 +367,67 @@ public class Tower_control : MonoBehaviour
                 }
             }
 
-            //La altura de la torre 
-            int altura = pieces_id.Count;
-            string turno = turnoUsuario ? "user" : "avatar";
-            string resultado = "";
-
             // Paso 5: Registrar resultados
 
-            if (result == 1 && !turnoUsuario)
+            switch (result)
             {
-                Debug.Log("Resultado: Turno avatar esperado.");
-                resultado = "WAIT";
-            }
-            else if (result == 2 && turnoUsuario)
-            {
-                Debug.Log("Resultado: Tiempo límite alcanzado.");
-                resultado = "OUT_OF_TIME";
-            }
-            else if (result == 3)
-            {
-                Debug.Log("Resultado: Tarea completada correctamente.");
-                resultado = "CORRECT";
-            }
-            else if (result == 0)
-            {
-                Debug.Log("Resultado: Turno incorrecto.");
-                resultado = "ERROR_TURN";
+                case 0:
+                    Debug.Log("Resultado: Turno avatar interrumpido por el usuario.");
+                    resultado = "ERROR_TURN";
+                    break;
+                case 1:
+                    Debug.Log("Resultado: Esperando turno del usuario.");
+                    resultado = "WAIT";
+                    break;
+                case 2:
+                    Debug.Log("Resultado: Tiempo agotado.");
+                    resultado = "OUT_OF_TIME";
+                    break;
+                case 3:
+                    Debug.Log("Resultado: Correcto.");
+                    resultado = "CORRECT";
+                    break;
+                default:
+                    Debug.Log("Resultado: Desconocido.");
+                    resultado = "DESCONOCIDO";
+                    break;
             }
 
-            var api = apiController.GetComponent<OpenAIAvatarDirector>();
-            api.GenerarRespuestaYAudio(altura, turno, user_type, resultado, onDone: (texto, clip) =>
+            altura = pieces_id.Count;
+
+            new_clip = false;
+            api.GenerateTowerResponseAndAudio(altura, turno, ult_turno, user_type, resultado, ult_resultado, "FEEDBACK_RESULTADO", onDone: (texto, clip) =>
             {
                 Debug.Log("Texto del avatar: " + texto);
 
                 if (clip != null)
                 {
+                    new_clip = true;
                     ch.Speak(clip);
                 }
             });
 
-            yield return new WaitForSeconds(3f);
+            yield return new WaitUntil(() => new_clip);
             yield return new WaitUntil(() => !ch.isSpeaking());
-            yield return new WaitForSeconds(5f);
+
+            ult_turno = turno;
+            ult_resultado = resultado;
         }
     }
 
     // ----------------- Helpers -----------------
+
+    private IEnumerator WaitWithTouch(float time, System.Func<bool> shouldStop)
+    {
+        float t = 0f;
+        while (t < time)
+        {
+            if (shouldStop != null && shouldStop())
+                yield break;
+            t += Time.deltaTime;
+            yield return null;
+        }
+    }
 
     // Espera a que el personaje termine de moverse, comprobando colocación durante el trayecto
     private IEnumerator MoveWaitWithPlacement(Character ch, System.Func<bool> shouldStop)
@@ -386,6 +448,30 @@ public class Tower_control : MonoBehaviour
             if (t >= hardTimeout)
             {
                 Debug.LogWarning("Timeout de movimiento alcanzado.");
+                yield break;
+            }
+            yield return null;
+        }
+    }
+
+    private IEnumerator SpeakWaitWithPlacement(Character ch, System.Func<bool> shouldStop)
+    {
+        const float hardTimeout = 10f;
+        float t = 0f;
+
+        // Salida inmediata si ya se cumplió la condición antes de empezar
+        if (shouldStop != null && shouldStop())
+            yield break;
+
+        while (ch.isSpeaking())
+        {
+            if (shouldStop != null && shouldStop())
+                yield break;
+
+            t += Time.deltaTime;
+            if (t >= hardTimeout)
+            {
+                Debug.LogWarning("Timeout de habla alcanzado.");
                 yield break;
             }
             yield return null;
