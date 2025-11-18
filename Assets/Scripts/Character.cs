@@ -118,6 +118,11 @@ public class Character : MonoBehaviour
         source.PlayOneShot(randomClip);
     }
 
+    public void StopSpeaking()
+    {
+        source.Stop();
+    }
+
     public bool isSpeaking()
     {
         return source.isPlaying;

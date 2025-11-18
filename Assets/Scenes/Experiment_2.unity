@@ -2416,7 +2416,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 300867792}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Audio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2632,8 +2632,6 @@ MonoBehaviour:
   avatar: {fileID: 1211903750}
   left_rest: {fileID: 913549002}
   right_rest: {fileID: 511083724}
-  head_look: {fileID: 1928297775}
-  look_target: {fileID: 1737819113}
   apiController: {fileID: 1077847121}
   audioSource: {fileID: 1575700803}
   timeLimit: 10
@@ -2648,7 +2646,7 @@ Transform:
   m_GameObject: {fileID: 327811657}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.14278, y: 1.47072, z: -0.26384}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3609,7 +3607,7 @@ GameObject:
   - component: {fileID: 493714308}
   - component: {fileID: 493714307}
   - component: {fileID: 493714306}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Surface
   m_TagString: Untagged
   m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
@@ -3670,7 +3668,7 @@ GameObject:
   - component: {fileID: 494643646}
   - component: {fileID: 494643648}
   - component: {fileID: 494643647}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: ButtonRingShadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4423,7 +4421,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 529039903}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5205,7 +5203,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 631225676}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5647,14 +5645,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b0030b47ca80ed44b32bdc601eb4b49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Piper.PiperManager
-  modelAsset: {fileID: 5022602860645237092, guid: c5c4b03e0dbca4548be0bb890ca86677, type: 3}
-  sampleRate: 22050
-  scaleSpeed: 1
-  scalePitch: 1
-  scaleGlottal: 0.8
-  espeakNgRelativePath: espeak-ng-data
-  voice: en-us
-  backendType: 257
 --- !u!1 &678054250
 GameObject:
   m_ObjectHideFlags: 0
@@ -5943,7 +5933,7 @@ GameObject:
   - component: {fileID: 731509456}
   - component: {fileID: 731509458}
   - component: {fileID: 731509457}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: BasicPokeToyButtonPressAudio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9087,7 +9077,7 @@ GameObject:
   - component: {fileID: 996157865}
   - component: {fileID: 996157864}
   - component: {fileID: 996157863}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10284,7 +10274,7 @@ GameObject:
   - component: {fileID: 1178095743}
   - component: {fileID: 1178095745}
   - component: {fileID: 1178095744}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: ButtonRing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10403,7 +10393,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1205710649}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: RedButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12424,7 +12414,7 @@ GameObject:
   - component: {fileID: 1406692108}
   - component: {fileID: 1406692110}
   - component: {fileID: 1406692109}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12705,7 +12695,7 @@ GameObject:
   - component: {fileID: 1423855287}
   - component: {fileID: 1423855289}
   - component: {fileID: 1423855288}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: BasicPokeToyButtonReleaseAudio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13886,7 +13876,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1473808669
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18220,7 +18210,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2030497130}
   - component: {fileID: 2030497131}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: ButtonVisual
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -18769,7 +18759,7 @@ GameObject:
   - component: {fileID: 5422354322301818096}
   - component: {fileID: 7348127283345346503}
   - component: {fileID: 7348127283345346504}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}

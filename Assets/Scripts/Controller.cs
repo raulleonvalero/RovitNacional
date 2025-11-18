@@ -14,15 +14,21 @@ public class Controller : MonoBehaviour
     [SerializeField] private GameObject left_rest;
     [SerializeField] private GameObject right_rest;
 
+    [Header("GPTClient")]
+    [SerializeField] private GameObject apiController;
+    [SerializeField] private AudioSource audioSource;
+
     [Header("Experimento")]
     [SerializeField] private float timeLimit = 15f;
+    [SerializeField] string user_type = "TEA";
+    [SerializeField] int num_trials = 10;
 
-    // Parámetros del experimento 
+    // Parámetros del experimento
+    private int current_trial = 0;
     private bool experimentRunning = false;
     private bool user = false;
     private bool complete = false;
     private int piece_id = 0;
-    private int result = 0;
 
     // Parametros auxiliares
     private Vector3 piece_height_offset = new Vector3(0, 0.1f, 0);
@@ -34,7 +40,7 @@ public class Controller : MonoBehaviour
         ch.MoveLeftHand(left_rest.transform.position, 0.3f);
         ch.MoveRightHand(right_rest.transform.position, 0.3f);
 
-        ch.setMode(Activity.GoStopGo, Mode.TEA);
+        //ch.setMode(Activity.GoStopGo, Mode.TEA);
     }
 
     public void OnStartExperimentButtonPressed()
@@ -90,168 +96,319 @@ public class Controller : MonoBehaviour
         }
     }
 
+    static string PieceName(int id)
+    {
+        switch (id)
+        {
+            case 0: return "cubo_rojo";
+            case 1: return "esfera_azul";
+            case 2: return "cilindro_verde";
+            default: return "desconocido";
+        }
+    }
+
+    private bool CheckForPieces()
+    {
+        for (int i = 0; i < pieces.Count; i++)
+        {
+            if (pieces[i] == null) continue;
+            if (pieces[i].GetComponent<SimpleRespawn>().IsBeingTouched())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     IEnumerator ExperimentRoutine()
     {
         Debug.Log("Experimento iniciado.");
+
         var ch = avatar.GetComponent<Character>();
+        var api = apiController.GetComponent<OpenAIAvatarDirector>();
 
-        // Paso 1: Explicación del experimento
-        ch.Speak("greeting_hello");
+        int result = 0;
 
-        while (ch.isSpeaking()) yield return null;
+        string turno = "";
+        string ult_turno = "";
 
-        yield return new WaitForSeconds(0.5f);
+        string resultado = "";
+        string ult_resultado = "";
+        int last_piece_id = -1;
 
-        ch.Speak("explain");
+        bool new_clip = false;
 
-        while (ch.isSpeaking()) yield return null;
+        new_clip = false;
+        api.GeneratePiecesResponseAndAudio(user_type, PieceName(piece_id), turno, ult_turno, resultado, ult_resultado, "EXPLICAR_EXPERIMENTO", onDone: (texto, clip) =>
+        {
+            Debug.Log("Texto del avatar: " + texto);
 
-        yield return new WaitForSeconds(0.5f);
+            if (clip != null)
+            {
+                new_clip = true;
+                ch.Speak(clip);
+            }
+        });
+
+        yield return new WaitUntil(() => new_clip);
+        yield return new WaitUntil(() => !ch.isSpeaking());
 
         while (true) // bucle de trials; si quieres número fijo, reemplaza por for (int t=0; t<T; t++)
         {
             SetRandomSpawns();
 
-            // Paso 2: seleccionar usuario o avatar y una pieza aleatoria
-            user = Random.Range(0, 2) == 1;                  // true = user, false = avatar
+            result = -1;
+            resultado = "";
+
+            bool touchedPiece = false;
+            bool User_turn;
             piece_id = Random.Range(0, Mathf.Max(1, pieces.Count));
 
-            if (!user) ch.Speak("turn_my_turn");
-            else ch.Speak("turn_your_turn");
-
-            while (ch.isSpeaking()) yield return null;
-
-            yield return new WaitForSeconds(0.5f);
-
-            if (user)
+            if (ult_resultado == "WRONG_PIECE")
             {
-                if (piece_id == 0) ch.Speak("action_touch_cube_red_user");
+                User_turn = true;
+                piece_id = last_piece_id;
+            }
 
-                else if (piece_id == 1) ch.Speak("action_touch_sphere_blue_user");
+            else if (ult_resultado == "ERROR_TURN")
+            {
+                User_turn = false;
+            }
 
-                else if (piece_id == 2) ch.Speak("action_touch_cylinder_green_avatar");
+            else
+            {
+                if (ult_turno == "usuario")
+                    User_turn = (Random.Range(0, 4) <= 2) ? false : true;
+                else
+                    User_turn = (Random.Range(0, 4) > 2) ? false : true;
+            }
+
+            turno = User_turn ? "usuario" : "avatar";
+
+            new_clip = false;
+            api.GeneratePiecesResponseAndAudio(user_type, PieceName(piece_id), turno, ult_turno, resultado, ult_resultado, "INDICAR_TURNO_ACTUAL", onDone: (texto, clip) =>
+            {
+                Debug.Log("Texto del avatar: " + texto);
+
+                if (clip != null)
+                {
+                    new_clip = true;
+                    ch.Speak(clip);
+                }
+            });
+
+            yield return new WaitUntil(() => new_clip);
+            yield return SpeakWaitWithTouch(ch, () =>
+            {
+                if (touchedPiece) return true;           // ya colocada antes
+                touchedPiece = CheckForPieces();         // comprobar ahora
+                return touchedPiece;                      // parar si se acaba de colocar
+            });
+
+            if (touchedPiece)
+            {
+                ch.StopSpeaking();
+                complete = true;
+            }
+
+            if (!User_turn)
+            {
+
+                bool use_right = pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() != spawnPoints[2]; // Si la pieza está en el spawn derecho
+
+                if (!touchedPiece)
+                {
+                    yield return WaitWithTouch(3.0f, () =>
+                    {
+                        if (touchedPiece) return true;
+                        touchedPiece = CheckForPieces();
+                        return touchedPiece;
+                    });
+
+                    // 1) Mano hacia la pieza
+                    if (use_right)
+                        ch.MoveRightHand(pieces[piece_id].transform.position + piece_height_offset, 0.6f);
+                    else
+                        ch.MoveLeftHand(pieces[piece_id].transform.position + piece_height_offset, 0.6f);
+
+                    yield return MoveWaitWithTouch(ch, () =>
+                    {
+                        if (touchedPiece) return true;
+                        touchedPiece = CheckForPieces();
+                        return touchedPiece;
+                    });
+
+                    yield return WaitWithTouch(1.5f, () =>
+                    {
+                        if (touchedPiece) return true;
+                        touchedPiece = CheckForPieces();
+                        return touchedPiece;
+                    });
+                }
+
+                if (touchedPiece)
+                {
+                    ch.SetLeftHand(left_rest.transform);
+                    ch.SetRightHand(right_rest.transform);
+                    result = 0;
+                }
+                else
+                {
+                    if (use_right)
+                        ch.MoveRightHand(right_rest.transform.position, 0.6f);
+                    else
+                        ch.MoveLeftHand(left_rest.transform.position, 0.6f);
+
+                    result = 1;
+                }
             }
             else
             {
-                if (piece_id == 0) ch.Speak("action_touch_cube_red_avatar");
+                complete = false;
+                float timer = 0f;
 
-                else if (piece_id == 1) ch.Speak("action_touch_sphere_blue_avatar");
-
-                else if (piece_id == 2) ch.Speak("action_touch_cylinder_green_avatar");
-            }
-
-            while (ch.isSpeaking()) yield return null; // Espera hasta que termine de hablar
-
-            // Paso 4: Detectar si la tarea se completa con límite de tiempo
-
-            if (!user){
-
-                yield return new WaitForSeconds(3f);
-
-                if (pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() == spawnPoints[2]) // Si la pieza está en el spawn derecho
+                while (!complete)
                 {
-                    ch.MoveLeftHand(pieces[piece_id].transform.position + piece_height_offset, 0.4f);
-                }
-                else
-                {
-                    ch.MoveRightHand(pieces[piece_id].transform.position + piece_height_offset, 0.4f);
-                }
-            }
+                    timer += Time.deltaTime;
 
-            complete = false;
-            result = 0;
-            float timer = 0f;
-
-            while (!complete)
-            {
-                timer += Time.deltaTime;
-
-                if (timer >= timeLimit)
-                {
-                    result = 1; // Tiempo límite alcanzado
-                    Debug.Log("Tiempo límite alcanzado. Tarea no completada.");
-                    complete = true;
-                    break;
-                }
-
-                for (int i = 0; i < pieces.Count; i++)
-                {
-                    var piece = pieces[i];
-                    if (piece == null) continue;
-
-                    var simpleRespawn = piece.GetComponent<SimpleRespawn>();
-                    if (simpleRespawn != null && simpleRespawn.IsBeingTouched())
+                    if (timer >= timeLimit)
                     {
-                        if (i == piece_id && user)
-                        {
-                            complete = true;
-                            result = 2; // Tarea completada correctamente
-                            Debug.Log("Tarea completada correctamente.");
-                        }
-                        else
-                        {
-                            complete = true;
-                            result = 3; // Pieza incorrecta seleccionada
-                            Debug.Log("Pieza incorrecta seleccionada.");
-                        }
+                        result = 2;
+                        complete = true;
                         break;
                     }
-                }
 
-                yield return null; // ¡No bloquear! Espera al siguiente frame
+                    for (int i = 0; i < pieces.Count; i++)
+                    {
+                        var piece = pieces[i];
+                        if (piece == null) continue;
+
+                        var simpleRespawn = piece.GetComponent<SimpleRespawn>();
+                        if (simpleRespawn != null && simpleRespawn.IsBeingTouched())
+                        {
+                            complete = true;
+                            result = (i == piece_id) ? 3 : 4;
+                            break;
+                        }
+                    }
+
+                    yield return null; // ¡No bloquear! Espera al siguiente frame
+                }
             }
-
-            if (!user)
-            {
-                if (pieces[piece_id].GetComponent<SimpleRespawn>().getSpawnPoint() == spawnPoints[2]) // Si la pieza está en el spawn derecho
-                {
-                    ch.MoveLeftHand(left_rest.transform.position, 0.6f);
-                }
-                else
-                {
-                    ch.MoveRightHand(right_rest.transform.position, 0.6f);
-                }
-
-            }
-
-            yield return new WaitForSeconds(1.5f);
-
-            ch.SetLeftHand(left_rest.transform);
-            ch.SetRightHand(right_rest.transform);
 
             // Paso 5: Registrar resultados
-            if (result == 1 && user)
+
+            switch (result)
             {
-                Debug.Log("Resultado: Tiempo límite alcanzado.");
-                ch.Speak("notice_objects_move");
-            }
-            else if (result == 1 && !user)
-            {
-                Debug.Log("Resultado: Tarea completada correctamente.");
-                ch.Speak("praise_wait_turn");
-            }
-            else if (!user && (result == 2 || result == 3))
-            {
-                Debug.Log("Resultado: Turno incorrecto.");
-                ch.Speak("error_wait_turn");
-            }
-            else if (user && result == 2)
-            {
-                Debug.Log("Resultado: Tarea completada correctamente.");
-                ch.Speak("praise_good_job");
-            }
-            else if (user && result == 3)
-            {
-                Debug.Log("Resultado: Pieza incorrecta seleccionada.");
-                ch.Speak("error_wrong_object");
+                case 0:
+                    Debug.Log("Resultado: Turno avatar interrumpido por el usuario.");
+                    resultado = "ERROR_TURN";
+                    break;
+                case 1:
+                    Debug.Log("Resultado: Esperando turno del usuario.");
+                    resultado = "WAIT";
+                    break;
+                case 2:
+                    Debug.Log("Resultado: Tiempo agotado.");
+                    resultado = "OUT_OF_TIME";
+                    break;
+                case 3:
+                    Debug.Log("Resultado: Correcto.");
+                    resultado = "CORRECT";
+                    break;
+                case 4:
+                    Debug.Log("Resultado: Pieza incorrecta.");
+                    resultado = "WRONG_PIECE";
+                    break;
+                default:
+                    Debug.Log("Resultado: Desconocido.");
+                    resultado = "DESCONOCIDO";
+                    break;
             }
 
-            while (ch.isSpeaking())
+            new_clip = false;
+            api.GeneratePiecesResponseAndAudio(user_type, PieceName(piece_id), turno, ult_turno, resultado, ult_resultado, "FEEDBACK_RESULTADO", onDone: (texto, clip) =>
             {
-                yield return null; // Espera hasta que termine de hablar
-            }
+                Debug.Log("Texto del avatar: " + texto);
 
-            yield return new WaitForSeconds(2f);
+                if (clip != null)
+                {
+                    new_clip = true;
+                    ch.Speak(clip);
+                }
+            });
+
+            yield return new WaitUntil(() => new_clip);
+            yield return new WaitUntil(() => !ch.isSpeaking());
+
+            // Preparar para el siguiente trial
+            ult_turno = turno;
+            ult_resultado = resultado;
+            current_trial++;
+            last_piece_id = piece_id;
+        }
+    }
+
+    // ----------------- Helpers -----------------
+
+    private IEnumerator WaitWithTouch(float time, System.Func<bool> shouldStop)
+    {
+        float t = 0f;
+        while (t < time)
+        {
+            if (shouldStop != null && shouldStop())
+                yield break;
+            t += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    // Espera a que el personaje termine de moverse, comprobando si se ha tocado algo
+    private IEnumerator MoveWaitWithTouch(Character ch, System.Func<bool> shouldStop)
+    {
+        const float hardTimeout = 10f;
+        float t = 0f;
+
+        // Salida inmediata si ya se cumplió la condición antes de empezar
+        if (shouldStop != null && shouldStop())
+            yield break;
+
+        while (ch.isMoving())
+        {
+            if (shouldStop != null && shouldStop())
+                yield break;
+
+            t += Time.deltaTime;
+            if (t >= hardTimeout)
+            {
+                Debug.LogWarning("Timeout de movimiento alcanzado.");
+                yield break;
+            }
+            yield return null;
+        }
+    }
+
+    private IEnumerator SpeakWaitWithTouch(Character ch, System.Func<bool> shouldStop)
+    {
+        const float hardTimeout = 10f;
+        float t = 0f;
+
+        // Salida inmediata si ya se cumplió la condición antes de empezar
+        if (shouldStop != null && shouldStop())
+            yield break;
+
+        while (ch.isSpeaking())
+        {
+            if (shouldStop != null && shouldStop())
+                yield break;
+
+            t += Time.deltaTime;
+            if (t >= hardTimeout)
+            {
+                Debug.LogWarning("Timeout de habla alcanzado.");
+                yield break;
+            }
+            yield return null;
         }
     }
 }
