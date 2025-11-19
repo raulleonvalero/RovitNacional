@@ -1,4 +1,5 @@
 using RovitNacional;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,12 +13,17 @@ public class Init_app : MonoBehaviour
     public GameObject[] NoDestroy;
 
     public TextMeshProUGUI output;
+
     public TextMeshProUGUI actividad;
     public TextMeshProUGUI modo;
+    public TextMeshProUGUI Nombre;
+    public UnityEngine.UI.Slider NTurnos;
+    public TextMeshProUGUI labelScroll;
 
     public ScrollRect scrollView;
 
-    private bool inExperiment = false;
+    private bool inExperiment = false; //TODO Cambiar por Variables.isRunning
+    private bool firstTime = true;
 
     public RecenterFromScript rec;
 
@@ -33,8 +39,8 @@ public class Init_app : MonoBehaviour
                 output = t;
         }
 
-        Logging.createFile();
-        Logging.WriteLog(-1,-1, "APP init");
+        //Logging.createFile();
+        //Logging.WriteLog(-1,-1, "APP init");
 
         foreach(GameObject gb in NoDestroy)
         {
@@ -57,13 +63,20 @@ public class Init_app : MonoBehaviour
             case "Sindrome de Down": Experimento.Modo = Mode.Down; break;
             case "Altas Capacidades": Experimento.Modo = Mode.AC; break;
         }
+
+        Experimento.Nombre = Nombre.text;
+
+        if (firstTime) Logging.createFile(Nombre.text);
+        firstTime = false;
+
+        Experimento.NTrunos = (int) NTurnos.value;
+
         Logging.WriteLog(-1,-1, "Cargando Exeprimento");
         inExperiment = true;
         if (Experimento.Actividad == Activity.GoStopGo)
             SceneManager.LoadScene("Experiment_1");
         if (Experimento.Actividad == Activity.BuldingTower)
             SceneManager.LoadScene("Experiment_2");
-
     }
 
     public void OnButtonQuitClick()
@@ -98,5 +111,7 @@ public class Init_app : MonoBehaviour
     {
         output.text = Variables.logOutput;
         scrollView.normalizedPosition = new Vector2(0, 0);
+
+        labelScroll.text = ((int)NTurnos.value).ToString();
     }
 }
