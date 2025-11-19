@@ -19,8 +19,10 @@ public class Init_app : MonoBehaviour
 
     private bool inExperiment = false;
 
+    public RecenterFromScript rec;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    
+
     void Start()
     {
         TextMeshProUGUI[] textos = GameObject.FindObjectsByType<TextMeshProUGUI>(FindObjectsSortMode.InstanceID);
@@ -66,6 +68,8 @@ public class Init_app : MonoBehaviour
 
     public void OnButtonQuitClick()
     {
+        rec.RecenterUser();
+
         if (inExperiment)
         {
             SceneManager.LoadScene("MainScene");

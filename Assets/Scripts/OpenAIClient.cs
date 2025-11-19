@@ -201,7 +201,7 @@ public class OpenAIAvatarDirector : MonoBehaviour
         - Adapta el lenguaje al tipo de usuario (TEA; DOWN, AC)
         - Máximo 2 frases cortas.
 
-        Ejemplos de estilo (no los repitas literalmente, úsalos como guía):
+        Ejemplos de estilo ** NO los repitas literalmente, úsalos como guía **:
         - TEA: ""Vamos a construir una torre de cubos. Tú y yo pondremos cubos por turnos: primero uno, luego el otro.""
         - DOWN: ""Vamos a hacer una torre juntos. Primero uno de nosotros pone un cubo, luego el otro pone un cubo más.""
         - AC: ""Vamos a construir una torre por turnos. Tú y yo iremos alternando los cubos para ver hasta dónde llegamos sin que se caiga.""
@@ -231,7 +231,7 @@ public class OpenAIAvatarDirector : MonoBehaviour
           * Ejemplo de estilo  ** NO los repitas literalmente, úsalos como guía **:
             ""Recuerda, ahora es mi turno, voy a colocar un cubo en la torre.""
 
-        Ejemplos (no los repitas literalmente, son solo guía de estilo):
+        Ejemplos ** NO los repitas literalmente, úsalos como guía **:
         - altura = 1, turno_actual = avatar, turno_anterior = avatar:
           ""Vuelve a ser mi turno, coloco un cubo en la torre.""
         - altura = 2, turno_actual = usuario:
@@ -260,7 +260,7 @@ public class OpenAIAvatarDirector : MonoBehaviour
         - No menciones los parámetros JSON ni las reglas del experimento.   
         - Ajusta el estilo según tipo_usuario (TEA, DOWN, AC).
 
-        Ejemplos:
+        Ejemplos ** NO los repitas literalmente, úsalos como guía **:
         - altura: 0, turno_actual: usuario, tipo_usuario: TEA, resultado: CORRECT
           => ""Has puesto muy bien el primer cubo. Buen trabajo.""
 

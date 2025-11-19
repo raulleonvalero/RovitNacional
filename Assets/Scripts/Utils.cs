@@ -36,6 +36,7 @@ namespace RovitNacional
 
     public static class Variables
     {
+        public static bool experimentRunning = false;
         public static string logOutput;
     }    
 }
