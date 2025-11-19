@@ -19,6 +19,8 @@ namespace RovitNacional
     {
         private static Activity _actividad;
         private static Mode _modo;
+        private static string _nombre;
+        private static int _nTurnos;
 
         public static Activity Actividad
         {
@@ -30,6 +32,23 @@ namespace RovitNacional
         {
             get => _modo;
             set => _modo = value;
+        }
+
+        public static string Nombre
+        {
+            get => _nombre;
+            set => _nombre = value; 
+        }
+
+        public static int NTrunos
+        {
+            get => _nTurnos;
+            set
+            {
+                if (value < 2) _nTurnos = 2;
+                if (value > 14) _nTurnos = 14;
+                else _nTurnos = value;
+            }
         }
         
     }

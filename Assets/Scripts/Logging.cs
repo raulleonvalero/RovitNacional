@@ -10,9 +10,9 @@ namespace RovitNacional
         private static string logPath = "INFO";
         private static string logFile;
 
-        public static void createFile()
+        public static void createFile(string nombre)
         {
-            logFile = Path.Combine(logPath, DateTime.Now.ToString("yyyy-MM-dd"), DateTime.Now.ToString("HH-mm-ss") + ".log");
+            logFile = Path.Combine(logPath, DateTime.Now.ToString("yyyy-MM-dd"), nombre + "_" + DateTime.Now.ToString("HH-mm-ss") + ".log");
             DirectoryInfo directory  = Directory.CreateDirectory(Path.GetDirectoryName(logFile));
 
         }
