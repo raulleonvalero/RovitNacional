@@ -3,6 +3,7 @@ using System.Collections;             // <- Necesario para IEnumerator/Coroutine
 using System.Collections.Generic;
 using static Unity.Mathematics.math;
 using RovitNacional;
+using UnityEngine.SceneManagement;
 
 public class Tower_control : MonoBehaviour
 {
@@ -31,10 +32,11 @@ public class Tower_control : MonoBehaviour
 
     // Parámetros del experimento 
     [Header("Experiment")]
+    [SerializeField] private int AlturaMaxima = 8;
     [SerializeField] private float timeLimit = 15f;
     [SerializeField] bool easy_mode = true;
     [SerializeField] string user_type = "TEA";
-    private bool experimentRunning = false;
+
     private bool complete = false;
     private List<int> pieces_id = new List<int>();
     private int result = 0;
@@ -53,32 +55,26 @@ public class Tower_control : MonoBehaviour
 
         ch.setMode(Activity.BuldingTower, Mode.TEA);
 
-
-        //disable next piece at start
-        next_piece.SetActive(false);
+        if (easy_mode)
+        {
+            next_piece.SetActive(true);
+        }
+        StartCoroutine(ExperimentRoutine());
+        Variables.experimentRunning = true;
     }
 
     public void OnStartExperimentButtonPressed()
     {
-        if (experimentRunning)
-        {
-            StopAllCoroutines();
-            experimentRunning = false;
-        }
-        else
-        {
-            if (easy_mode)
-            {
-                next_piece.SetActive(true);
-            }
-            StartCoroutine(ExperimentRoutine());
-            experimentRunning = true;
-        }
+
     }
 
     void Update()
     {
-        
+        if (!Variables.experimentRunning)
+        {
+            StopAllCoroutines();
+            SceneManager.LoadScene("MainScene");
+        }
     }
 
     private bool OnNextPiece(Transform piece_transform)
@@ -197,9 +193,19 @@ public class Tower_control : MonoBehaviour
         return false;
     }
 
+    private string iteracionResult(int altura, int AlturaMaxima, string turno, string ult_turno, string resultado, string ult_resultado)
+    {
+        string result = "Altura " + altura + " de " + AlturaMaxima + ". ";
+        result += "Turno: " + turno + ". ";
+        result += "Último Turno: " + ult_turno + ". ";
+        result += "Resultado: " + resultado + ". ";
+        result += "Último Resultado: " + ult_resultado + ". ";
+        return result;
+    }
+
     public IEnumerator ExperimentRoutine()
     {
-        Debug.Log("Experimento iniciado.");
+        Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Inicio Experimento Torre");
 
         var ch = avatar.GetComponent<Character>();
         var api = apiController.GetComponent<OpenAIAvatarDirector>();
@@ -216,7 +222,7 @@ public class Tower_control : MonoBehaviour
         new_clip = false;
         api.GenerateTowerResponseAndAudio(altura, turno, ult_turno, user_type, resultado, ult_resultado, "EXPLICAR_EXPERIMENTO", onDone: (texto, clip) =>
         {
-            Debug.Log("Texto del avatar: " + texto);
+            Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Explicación del experimento: " + texto);
 
             if (clip != null)
             {
@@ -229,7 +235,7 @@ public class Tower_control : MonoBehaviour
         yield return new WaitUntil(() => !ch.isSpeaking());
 
         // Bucle principal: hasta tener 8 piezas colocadas
-        while (pieces_id.Count < 8)
+        while (pieces_id.Count < AlturaMaxima)
         {
 
             bool piezaColocada = false;
@@ -253,7 +259,7 @@ public class Tower_control : MonoBehaviour
             new_clip = false;
             api.GenerateTowerResponseAndAudio(altura, turno, ult_turno, user_type, resultado, ult_resultado, "INDICAR_TURNO_ACTUAL", onDone: (texto, clip) =>
             {
-                Debug.Log("Texto del avatar: " + texto);
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Indicación de turno: " + texto);
 
                 if (clip != null)
                 {
@@ -372,23 +378,23 @@ public class Tower_control : MonoBehaviour
             switch (result)
             {
                 case 0:
-                    Debug.Log("Resultado: Turno avatar interrumpido por el usuario.");
+                    Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Resultado: turno avatar interrumpido.");
                     resultado = "ERROR_TURN";
                     break;
                 case 1:
-                    Debug.Log("Resultado: Esperando turno del usuario.");
+                    Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Resultado: turno avatar completado.");
                     resultado = "WAIT";
                     break;
                 case 2:
-                    Debug.Log("Resultado: Tiempo agotado.");
+                    Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Resultado: Tiempo agotado.");
                     resultado = "OUT_OF_TIME";
                     break;
                 case 3:
-                    Debug.Log("Resultado: Correcto.");
+                    Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Resultado: Cubo colocado correctamente.");
                     resultado = "CORRECT";
                     break;
                 default:
-                    Debug.Log("Resultado: Desconocido.");
+                    Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Resultado: Desconocido.");
                     resultado = "DESCONOCIDO";
                     break;
             }
@@ -398,7 +404,7 @@ public class Tower_control : MonoBehaviour
             new_clip = false;
             api.GenerateTowerResponseAndAudio(altura, turno, ult_turno, user_type, resultado, ult_resultado, "FEEDBACK_RESULTADO", onDone: (texto, clip) =>
             {
-                Debug.Log("Texto del avatar: " + texto);
+                Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Feedback del resultado: " + texto);
 
                 if (clip != null)
                 {
@@ -410,9 +416,15 @@ public class Tower_control : MonoBehaviour
             yield return new WaitUntil(() => new_clip);
             yield return new WaitUntil(() => !ch.isSpeaking());
 
+            Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, iteracionResult(altura, AlturaMaxima, turno, ult_turno, resultado, ult_resultado));
+
             ult_turno = turno;
             ult_resultado = resultado;
         }
+
+        // Fin del experimento
+        Logging.WriteLog((int)Experimento.Actividad, (int)Experimento.Modo, "Fin del experimento. Torre completada.");
+        Variables.experimentRunning = false;
     }
 
     // ----------------- Helpers -----------------

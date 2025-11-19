@@ -56,7 +56,7 @@ public class ExperimentController : MonoBehaviour
         if (currentTrial >= totalTrials) { Finish(); return; }
         OnTrialChanged?.Invoke(currentTrial);
 
-        // TODO: lanza estímulos, condiciones, timers, etc.
+        // TODO: lanza estÃ­mulos, condiciones, timers, etc.
         // Puedes usar rng para contrabalanceo/aleatoriedad.
     }
 
