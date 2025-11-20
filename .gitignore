@@ -81,6 +81,7 @@ InitTestScene*.unity*
 
 # Addressables default ignores, before user customizations
 /ServerData
+/[Aa]ssets/StreamingAssets/
 /[Aa]ssets/StreamingAssets/aa*
 /[Aa]ssets/AddressableAssetsData/link.xml*
 /[Aa]ssets/Addressables_Temp*
@@ -100,3 +101,12 @@ InitTestScene*.unity*
 
 /[Aa]ssets/GaussianAssets/
 /[Aa]ssets/Modelo-realista/
+
+/INFO
+
+/[Aa]ssets/INFO/
+/[Aa]ssets/INFO.meta
+
+/[Aa]ssets/_Recovery*ç
+
+/Logss
