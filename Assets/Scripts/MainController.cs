@@ -1,6 +1,7 @@
 // Assets/Scripts/Experiment/ExperimentController.cs
 using UnityEngine;
 using System;
+using RovitNacional;
 
 public enum ExpState { Idle, Ready, Running, Paused, Finished, Aborted }
 
@@ -12,6 +13,10 @@ public class ExperimentController : MonoBehaviour
     // Eventos para sincronizar UI/logs
     public event Action<ExpState> OnStateChanged;
     public event Action<int> OnTrialChanged;
+
+    [Header("Camera Rig")]
+    [SerializeField] Transform cameraRig;
+    private float last_scale = 1f;
 
     [Header("Trials")]
     [SerializeField] int totalTrials = 20;
@@ -27,6 +32,16 @@ public class ExperimentController : MonoBehaviour
     {
         seed = newSeed;
         rng = new System.Random(seed);
+    }
+
+    void Update()
+    {
+        float new_scale = Experimento.Scale;
+        if (last_scale != new_scale)
+        {
+            cameraRig.localScale = new Vector3(new_scale, new_scale, new_scale);
+            last_scale = new_scale;
+        }
     }
 
     public void Prepare()

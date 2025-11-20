@@ -32,6 +32,7 @@ public class Tower_control : MonoBehaviour
 
     // Parámetros del experimento 
     [Header("Experiment")]
+    [SerializeField] Transform cameraRig;
     [SerializeField] private int AlturaMaxima = 8;
     [SerializeField] private float timeLimit = 15f;
     [SerializeField] bool easy_mode = true;
@@ -48,6 +49,13 @@ public class Tower_control : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        AlturaMaxima = Experimento.NTrunos;
+        timeLimit = Experimento.TimeLimit;
+        user_type = Experimento.getModeName();
+
+        float new_scale = Experimento.Scale;
+        cameraRig.localScale = new Vector3(new_scale, new_scale, new_scale);
+
         var ch = avatar.GetComponent<Character>();
 
         ch.MoveLeftHand(left_rest.transform.position, 0.3f);

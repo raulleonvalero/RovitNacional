@@ -8999,6 +8999,7 @@ MonoBehaviour:
   right_rest: {fileID: 527854807}
   apiController: {fileID: 1311686986}
   audioSource: {fileID: 752970972}
+  cameraRig: {fileID: 410096502}
   timeLimit: 5
   user_type: TEA
   num_trials: 10

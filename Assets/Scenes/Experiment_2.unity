@@ -2575,6 +2575,7 @@ MonoBehaviour:
   right_rest: {fileID: 511083724}
   apiController: {fileID: 1077847121}
   audioSource: {fileID: 1575700803}
+  cameraRig: {fileID: 2060976826}
   AlturaMaxima: 8
   timeLimit: 10
   easy_mode: 1
