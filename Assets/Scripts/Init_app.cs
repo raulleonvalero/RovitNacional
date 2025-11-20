@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
-
 public class Init_app : MonoBehaviour
 {
     public GameObject[] NoDestroy;
@@ -18,7 +17,11 @@ public class Init_app : MonoBehaviour
     public TextMeshProUGUI modo;
     public TextMeshProUGUI Nombre;
     public UnityEngine.UI.Slider NTurnos;
-    public TextMeshProUGUI labelScroll;
+    public UnityEngine.UI.Slider Scale;
+    public UnityEngine.UI.Slider TimeLimit;
+    public TextMeshProUGUI labelScrollTime;
+    public TextMeshProUGUI labelScrollTurns;
+    public TextMeshProUGUI labelScrollScale;
 
     public ScrollRect scrollView;
 
@@ -47,6 +50,7 @@ public class Init_app : MonoBehaviour
             DontDestroyOnLoad(gb);
         }
     }
+
     public void OnButtonStartClick()
     {
 
@@ -70,6 +74,8 @@ public class Init_app : MonoBehaviour
         firstTime = false;
 
         Experimento.NTrunos = (int) NTurnos.value;
+        Experimento.Scale = Scale.value;
+        Experimento.TimeLimit = TimeLimit.value;
 
         Logging.WriteLog(-1,-1, "Cargando Exeprimento");
         inExperiment = true;
@@ -95,6 +101,11 @@ public class Init_app : MonoBehaviour
         }
     }
 
+    public void OnButtonCenterClick()
+    {
+        Debug.Log("Recentering user...");
+    }
+
     public void OnLoadExperiment1()
     {
         Experimento.Actividad = Activity.GoStopGo;
@@ -112,6 +123,11 @@ public class Init_app : MonoBehaviour
         output.text = Variables.logOutput;
         scrollView.normalizedPosition = new Vector2(0, 0);
 
-        labelScroll.text = ((int)NTurnos.value).ToString();
+        labelScrollTurns.text = ((int)NTurnos.value).ToString();
+        labelScrollScale.text = Scale.value.ToString("F2");
+        labelScrollTime.text = TimeLimit.value.ToString("F0") + "s";
+
+        Experimento.Scale = Scale.value;
+        Debug.Log("[Scalar] Scale: " + Experimento.Scale);
     }
 }

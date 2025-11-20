@@ -17,10 +17,40 @@ namespace RovitNacional
 
     public static class Experimento
     {
-        private static Activity _actividad;
-        private static Mode _modo;
-        private static string _nombre;
-        private static int _nTurnos;
+        private static Activity _actividad = Activity.BuldingTower;
+        private static Mode _modo = Mode.TEA;
+        private static string _nombre = "Participante";
+        private static int _nTurnos = 5;
+        private static float _scale = 1.2f;
+        private static float _timeLimit = 10.0f;
+
+        public static string getActivityName()
+        {
+            switch (_actividad)
+            {
+                case Activity.BuldingTower:
+                    return "Construir Torre";
+                case Activity.GoStopGo:
+                    return "Go Stop Go";
+                default:
+                    return "Actividad Desconocida";
+            }
+        }
+
+        public static string getModeName()
+        {
+            switch (_modo)
+            {
+                case Mode.TEA:
+                    return "TEA";
+                case Mode.Down:
+                    return "Down";
+                case Mode.AC:
+                    return "AC";
+                default:
+                    return "Modo Desconocido";
+            }
+        }
 
         public static Activity Actividad
         {
@@ -28,7 +58,7 @@ namespace RovitNacional
             set => _actividad = value;
         }
 
-        public  static Mode Modo
+        public static Mode Modo
         {
             get => _modo;
             set => _modo = value;
@@ -50,7 +80,28 @@ namespace RovitNacional
                 else _nTurnos = value;
             }
         }
-        
+
+        public static float Scale
+        {
+            get => _scale;
+            set 
+            {
+                if (value < 1.0f) _scale = 1.0f;
+                if (value > 2.0f) _scale = 2.0f;
+                else _scale = value;
+            }
+        }
+
+        public static float TimeLimit
+        {
+            get => _timeLimit;
+            set 
+            {
+                if (value < 5.0f) _timeLimit = 5.0f;
+                if (value > 30.0f) _timeLimit = 30.0f;
+                else _timeLimit = value;
+            }
+        }
     }
 
     public static class Variables

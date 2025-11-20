@@ -20,6 +20,7 @@ public class Controller : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
 
     [Header("Experimento")]
+    [SerializeField] Transform cameraRig;
     [SerializeField] private float timeLimit = 15f;
     [SerializeField] string user_type = "TEA";
     [SerializeField] int num_trials = 10;
@@ -35,6 +36,13 @@ public class Controller : MonoBehaviour
 
     void Start()
     {
+        timeLimit = Experimento.TimeLimit;
+        num_trials = Experimento.NTrunos;
+        user_type = Experimento.getModeName();
+
+        float new_scale = Experimento.Scale;
+        cameraRig.localScale = new Vector3(new_scale, new_scale, new_scale);
+
         var ch = avatar.GetComponent<Character>();
 
         ch.MoveLeftHand(left_rest.transform.position, 0.3f);
