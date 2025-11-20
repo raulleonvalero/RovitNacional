@@ -28,7 +28,7 @@ public class Init_app : MonoBehaviour
     private bool inExperiment = false; //TODO Cambiar por Variables.isRunning
     private bool firstTime = true;
 
-    public RecenterFromScript rec;
+    public RecenterCameraRig rec;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
@@ -87,8 +87,6 @@ public class Init_app : MonoBehaviour
 
     public void OnButtonQuitClick()
     {
-        rec.RecenterUser();
-
         if (inExperiment)
         {
             SceneManager.LoadScene("MainScene");
@@ -103,7 +101,7 @@ public class Init_app : MonoBehaviour
 
     public void OnButtonCenterClick()
     {
-        Debug.Log("Recentering user...");
+        rec.Recenter();
     }
 
     public void OnLoadExperiment1()

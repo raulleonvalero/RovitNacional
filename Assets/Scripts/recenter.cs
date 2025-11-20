@@ -1,41 +1,27 @@
 using UnityEngine;
-using UnityEngine.XR;
-using System.Collections.Generic;
 
-public class RecenterFromScript : MonoBehaviour
+public class RecenterCameraRig : MonoBehaviour
 {
-    private XRInputSubsystem xrInput;
+    public Transform trackingSpace;   // Pon aquí el objeto "TrackingSpace"
+    public Transform hmd;             // Pon aquí el objeto "OVRHmd"
 
-    void Awake()
+    public void Recenter()
     {
-        // Get the OpenXR Input Subsystem used by Meta Quest runtime
-        List<XRInputSubsystem> subsystems = new List<XRInputSubsystem>();
-        SubsystemManager.GetSubsystems(subsystems);
-
-        if (subsystems.Count > 0)
-        {
-            xrInput = subsystems[0];
-            Debug.Log("[Recenter] XRInputSubsystem found!");
-        }
-        else
-        {
-            Debug.LogError("[Recenter] XRInputSubsystem NOT found.");
-        }
+        ResetYaw();
+        ResetPosition();
     }
 
-    public void RecenterUser()
+    void ResetYaw()
     {
-        if (xrInput == null)
-        {
-            Debug.LogError("[Recenter] No XRInputSubsystem.");
-            return;
-        }
+        float yaw = hmd.eulerAngles.y;
+        trackingSpace.Rotate(0, -yaw, 0);
+        Debug.Log("[Recenter] Yaw reset.");
+    }
 
-        bool ok = xrInput.TryRecenter();
-
-        if (ok)
-            Debug.Log("[Recenter] User recentered successfully.");
-        else
-            Debug.LogWarning("[Recenter] TryRecenter FAILED.");
+    void ResetPosition()
+    {
+        Vector3 offset = hmd.position - trackingSpace.position;
+        trackingSpace.position -= offset;
+        Debug.Log("[Recenter] Position reset.");
     }
 }

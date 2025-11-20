@@ -631,6 +631,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8756dffd75e36c14fb4fd392cf22e1a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+  trackingSpace: {fileID: 1714327980}
+  hmd: {fileID: 1588854286}
 --- !u!1 &206107444
 GameObject:
   m_ObjectHideFlags: 0
@@ -5714,7 +5716,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1789947464}
         m_TargetAssemblyTypeName: Init_app, Assembly-CSharp
-        m_MethodName: OnButtonStartClick
+        m_MethodName: OnButtonCenterClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8038,6 +8040,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1588854286 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2618914886016112181, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
+  m_PrefabInstance: {fileID: 1525870620}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1602837962
 GameObject:
   m_ObjectHideFlags: 0
